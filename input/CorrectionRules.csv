@@ -1,0 +1,415 @@
+Data Category,Entity,Element Name,Definition,Guidelines for Rules,Country/Industry,Sample Data
+Contact Data,Contact Data,,,,,
+Contact Data,Contact Data,Cash Compensation Contact Name,Cash Compensation Contact Name,,,Mr. Mike Smith
+Contact Data,Contact Data,Cash Compensation Contact Title,Cash Compensation Contact Title,,,Cash Contact
+Contact Data,Contact Data,Cash Compensation Contact Phone,Cash Compensation Contact Phone,,,+1 (212) 555-1111
+Contact Data,Contact Data,Cash Compensation Contact E-mail,Cash Compensation Contact E-mail,,,mike.smith@example.com
+Contact Data,Contact Data,Long-Term Incentive Plans Contact Name,Long-Term Incentive Plans Contact Name,,,Mr. Joe Brady
+Contact Data,Contact Data,Long-Term Incentive Plans Contact Title,Long-Term Incentive Plans Contact Title,,,Long Term Contact
+Contact Data,Contact Data,Long-Term Incentive Plans Contact Phone,Long-Term Incentive Plans Contact Phone,,,+1 (212) 555-1111
+Contact Data,Contact Data,Long-Term Incentive Plans Contact E-mail,Long-Term Incentive Plans Contact E-mail,,,joe.brady@example.com
+Organization Data,Participating Entity,,,,,
+Organization Data,Participating Entity,Participating Entity Name,The name of your organization.,,,Your Company Name
+Organization Data,Participating Entity,Participating Entity Country,The country where the participating entity is based/headquartered.,Refer to the Country Codes tab.,,GBR [United Kingdom]
+Organization Data,Participating Entity,Participating Entity Currency of Organization Elements,"The currency code for all Participating Entity elements (e.g., Annual Revenue).",Refer to the Country Codes tab.,,GBP [United Kingdom Pound]
+Organization Data,Participating Entity,Participating Entity Annual Revenue,The participating entity's total annual gross revenue for the most recent fiscal year.,"For the headquarter country, enter global revenue.
+
+For banks this is usually net interest income plus (where relevant/quantifiable) other revenue such as investment and fee income.
+
+For insurance companies, this is usually gross premium income (a.k.a. ""gross written premiums"") plus (where relevant/quantifiable) other revenue such as investment and fee income. Do not deduct premiums ceded to reinsurers for de-risking purposes.
+
+Note: enter all financial data in whole numbers.",,"76,000,000"
+Organization Data,Participating Entity,Participating Entity Annual Revenue Range (USD),The annual revenue range that best matches the country's USD annual revenue.,"A Less than 5M USD
+B 5M to 10M USD
+C 10M to 25M USD
+D 25M to 75M USD
+E 75M to 150M USD
+F 150M to 300M USD
+G 300M to 500M USD
+H 500M to 1BN USD
+I 1BN to 2BN USD
+J 2BN to 5BN USD
+K 5BN to 10BN USD
+L 10BN to 50BN USD
+M 50BN to 100BN USD
+N Greater than 100BN USD
+ 
+For the headquarter country, this is the range corresponding to global revenue.",,B [5M to 10M USD]
+Organization Data,Participating Entity,Participating Entity FTE Employee Range,The full-time equivalent (FTE) employee range that best matches the country's total FTE employees.,"To convert part-timers to FTEs, sum all part-time hours and divide by baseline annual hours (e.g., 40 weekly hours X 52 weeks = 2,080 annual hours). Add this to the number of full-time employees to calculate the total number of FTE employees.
+
+A-Under 90
+B-90 to 240
+C-240 to 620
+D-620 to 1,600
+E-1,600 to 4,100
+F-4,100 to 10,600
+G-10,600 to 27,500
+H-27,500 to 75,000
+I-75,000 to 200,000
+J-Greater than 200,000
+
+For the headquarter entity, enter global full-time equivalent (FTE) employees.",,"D [620 to 1,600]"
+Organization Data,Participating Entity,Participating Entity Geographic Scope,The geographic scope of the participating entity.,"S-Single - single country only
+M-Multi-Country - small cluster of countries
+R-Regional - an entire region, or multiple countries across one or two continents
+G-Global - three or more continents
+
+Select Single country when international operations are negligible.
+
+Select Multi-Country when international operations are limited to a small clusters of countries, e.g., Benelux, China and Hong Kong, Nordics, UK and Ireland, often grouped under a single legal entity.
+
+Select Regional when international operations are significant and covers an entire region, e.g., North America (U.S. and Canada), Western Europe, Middle East and Africa, Greater China (China, Hong Kong and Taiwan), South East Asia (SEA), Latin America, or multiple countries across one or two continents.
+
+Select Global when international operations are predominant and covers three or more continents.",,R [Regional]
+Organization Data,Participating Entity,Participating Entity Full Value Chain of Activities,"The extent to which the organization maintains end to end control of the business, including design, creation, sale and support of products and/or services.","Y-The organization controls the full value chain of activities for all regions/countries/subsidiaries.
+N-The organization does not control the full value chain of activities for all regions/countries/subsidiaries (e.g., entities may be independent).",,Y [The organization controls the full value chain of activities]
+Organization Data,Participating Entity,Participating Entity Products/Services in Single/Related Industries,Indicate whether the participating entity's products/services are in a single/related industry or span multiple distinct/unrelated industries.,"Y-Single/Related Industries
+N-Multiple/Diverse Industries",,Y [Single/Related Industries]
+Organization Data,Participating Entity,Participating Entity Survey Grade,"This field is automatically calculated based on the reported participating entity characteristics (i.e., Annual Revenue Range, FTE Employee Range, Geographic Scope, Full Value Chain of Activities, Products/ Services in Single/Related Industries).","Refer to the Organization/Business Unit Survey Grading Guidelines to determine if your organization qualifies as a business unit.
+ 
+Failure to provide any of the country characteristics will prevent the Survey Grade from being calculated. Country Survey Grades are calculated as an indication to guide the job matching of your incumbents within each entity and are used as a reference during data validation to detect incumbent Survey Grades that do not seem plausible.",,WTW use only
+Organization Data,Participating Entity,Participating Entity Main Pay Change Month,The effective date for pay changes.,"Where pay changes are effective over multiple months, select the month the majority of salary reviews become effective.
+
+When pay changes are effective on a rolling/anniversary review basis, select RR-Rolling Review.
+
+For countries where there is a union or mandatory increase, please consider the merit date and not the mandatory factor.",,01 [January]
+Organization Data,Participating Entity,Participating Entity Primary Industry,The primary industry that most closely describes the organization's line(s) of business.,Refer to the Industries tab.,,001 [Agricultural Products]
+Organization Data,Participating Entity,Participating Entity Performance Bonus Plan,"Organization has a performance bonus plan. This is an incentive scheme with a predetermined performance and reward schedule, whether or not deferred and irrespective of the delivery medium (cash or equity).","Y-Organization has a performance bonus plan
+N-No plan",,Y [Yes]
+Organization Data,Participating Entity,Participating Entity Sales Incentive Plan,Organization has a sales incentive plan.,"C-Organization has a Commission Plan
+G-Organization has a Goal-Based Sales Incentive Plan
+B-Organization has both a Commission and Goal-Based Sales Incentive Plan
+N-No Sales Incentive Plan
+
+Goal-Based: incentive earned based on performance relative to a quota, goal or other pre-determined performance objectives; although infrequent, may include goal-based mechanic for performance up to a threshold level (e.g., target, quota or point of excellence) and then commission-based mechanic beyond threshold.
+
+Commission: incentive earned / calculated using a commission rate (e.g., percentage of sales, profit, volume) or flat dollar amount applied to every dollar or unit sold.
+
+Note: The term ""sales commission"" or ""sales bonus"" may be used interchangeably by companies to describe all of the above incentive forms for sales professionals.",,C [Organization has a Commission plan]
+Organization Data,Participating Entity,Participating Entity Profit-Sharing Plan,Organization has a profit-sharing plan.,"Y-Organization has a profit-sharing plan
+N-No plan",,Y [Yes]
+Organization Data,Participating Entity,Participating Entity Car Benefit Plan,Organization has a company car benefit plan.,"Y-Organization has a company car benefit plan
+N-No plan",,Y [Yes]
+Organization Data,Participating Entity,Participating Entity Long-Term Incentive Plan,Organization offers Long-Term Incentive Plan.,"Y-Organization has a long-term incentive plan
+N-No plan",,Y [Yes]
+Organization Data,Participating Entity,Base Salary Number of Months for Performance Bonus Calculations,"The number of months of base salary that defines the annual base salary used as the basis to calculate your Target Performance Bonus, when reported as a % of Base Salary.",,LATAM ONLY,12.000
+Organization Data,Participating Entity,Base Salary Number of Months for Goal-Based Sales Incentive Calculations,"The number of months of base salary that defines the annual base salary used as the basis to calculate your Target Goal-Based Sales Incentive, when reported as a % of Base Salary.",,LATAM ONLY,12.000
+Organization Data,Parent Information,,,,,
+Organization Data,Parent Information,Parent Name,The name of the parent organization.,,,Parent Company Name
+Organization Data,Parent Information,Parent Nationality,The nationality of the parent organization.,Refer to the Country Codes tab.,,USA [United States]
+Organization Data,Parent Information,Parent Annual Revenue Range (USD),The annual revenue range that most closely matches the parent organization's USD annual revenue.,"A-Less than 5M USD
+B-5M to 10M USD
+C-10M to 25M USD
+D-25M to 75M USD
+E-75M to 150M USD
+F-150M to 300M USD
+G-300M to 500M USD
+H-500M to 1BN USD
+I-1BN to 2BN USD
+J-2BN to 5BN USD
+K-5BN to 10BN USD
+L-10BN to 50BN USD
+M-50BN to 100BN USD
+N-Greater than 100BN USD",,D [25M to 75M USD]
+Organization Data,Parent Information,Parent FTE Employee Range,The full-time equivalent (FTE) employee range that best matches the parent organization's total number of FTE employees.,"To convert part-timers to FTEs, sum all part-time hours and divide by baseline annual hours (e.g., 40 weekly hours x 52 weeks = 2,080 annual hours). Add this to the number of full-time employees to calculate the total number of FTE employees.
+
+A-Under 90
+B-90 to 240
+C-240 to 620
+D-620 to 1,600
+E-1,600 to 4,100
+F-4,100 to 10,600
+G-10,600 to 27,500
+H-27,500 to 75,000
+I-75,000 to 200,000
+J-Greater than 200,000",,"H [27,500 to 75,000]"
+Organization Data,Parent Information,Parent Geographic Scope,The geographic scope of the parent organization.,"S-Single - single country only
+M-Multi-Country - small cluster of countries
+R-Regional - an entire region, or multiple countries across one or two continents
+G-Global - three or more continents
+
+Select Single country when international responsibility is negligible. 
+
+Select Multi-Country when international responsibility is limited to a small cluster of countries, e.g., Benelux, China and Hong Kong, Nordics, UK and Ireland, often grouped under a single legal entity. 
+
+Select Regional when international responsibility is significant and covers an entire region, e.g., North America (U.S. and Canada), Western Europe, Middle East and Africa, Greater China (China, Hong Kong and Taiwan), South East Asia (SEA), Latin America, or multiple countries across one or two continents.
+
+Select Global when international responsibility is predominant and covers three or more continents. Parent Geographic Scope should also be Global.",,G [Global]
+Organization Data,Parent Information,Parent Full Value Chain of Activities,"The extent to which the parent maintains end-to-end control of the business, including design, creation, sale and support of products and/or services.","Y-The organization controls the full value chain of activities for all regions/countries/subsidiaries.
+N-the parent does not control the full value chain of activities for all regions/countries/subsidiaries (e.g., entities may be independent).",,Y [Yes]
+Organization Data,Parent Information,Parent Products/Services in Single/Related Industries,Indicate whether the parent's products/services are in a single/related industry or span multiple distinct/unrelated industries.,"Y-Single/Related Industries
+N-Multiple/Diverse Industries",,Y [Single/Related Industries]
+Organization Data,Parent Information,Parent Survey Grade,"This field is automatically calculated based on the reported parent organization characteristics (i.e., Annual Revenue Range, FTE Employee Range, Geographic Scope, Full Value Chain of Activities, Products/ Services in Single/Related Industries).","Refer to the Organization/Business Unit Survey Grading Guidelines to determine if your organization qualifies as a business unit.
+ 
+Failure to provide any of the parent characteristics will prevent the Survey Grade from being calculated. Parent Survey Grades are calculated as an indication to guide the job matching of your incumbents within each entity and are used as a reference during data validation to detect incumbent Survey Grades that do not seem plausible.",,WTW use only
+Incumbent Data,Employee Data,,,,,
+Incumbent Data,Employee Data,Country Code,The country code of the primary office to which they are assigned.,Refer to the Country Codes tab.,,GBR
+Incumbent Data,Employee Data,Area/City Code,The area/city code of the primary office to which the incumbent is assigned.,"Refer to the Country Codes tab.
+
+For remote employees, report their nominal office or location to which they are assigned
+
+For all regions except Moscow, Moscow region, Saint-Petersburg and Leningrad region apply the same area/city code to incumbents based in regional capital city and outside regional capital city within a region (e.g., RU033 for Novosibirsk and Novosibirsk region/oblast).
+
+For the cities of and regions around Moscow and Saint-Petersburg, more granular codes are available and should be applied as follows:
+- Apply RU001 to incumbents based in Moscow
+- Apply RU002 to incumbents based in Moscow region/oblast
+- Apply RU003 to incumbents based in Saint-Petersburg
+- Apply RU004 to incumbents based in Leningrad region/oblast",,GB001
+Incumbent Data,Employee Data,Postal/ZIP Code,The Postal/ZIP code for the incumbent's primary work location.,"For home based employees or equivalent, please provide the postcode of their nominal or primary office.","APAC, EMEA ONLY",75008
+Incumbent Data,Employee Data,Unique Incumbent Identifier,"Internal reference number, which is specific and unique to each individual.","Do not use personal identifying data (e.g., employee names, initials, or government ID such as Social Security or Social Insurance number).
+
+Use consistent identifiers year over year.",,12345
+Incumbent Data,Employee Data,Department Name,The name of the department in which the incumbent has primary responsibility.,For validation purposes only - submit if readily available from HRIS data exports.,,Accounting Department
+Incumbent Data,Employee Data,Internal Position Title,The internal job title your organization uses for this position.,Do not provide personally identifying information.,,Accounting Manager
+Incumbent Data,Employee Data,Internal Grade/Level/Band,The internal grade/level/band your organization uses for this position.,Values can be alpha or numeric. If an incumbent is not assigned to a grade/level or the organization does not use grades or levels this field should be left blank.,,AA
+Incumbent Data,Employee Data,Employee Status,The employee status of the incumbent.,"Brazil
+BRA01-Estatutário - Position defined by organization Statute, usually Top Executives
+BRA02-Não estatutário - Regular position in the organization, non-statutory",BRAZIL ONLY,BEL01
+Incumbent Data,Employee Data,Education Level,The education level of the incumbent.,"E00-Below Secondary School or Vocational Training
+E10-High/Secondary School
+E20-Junior College (typically 2 years post-secondary school)
+E30-Bachelor's Degree (typically 3-4 years post-secondary school)
+E40-Specialized Diploma (e.g., Engineering or Business Schools)
+E45-Specialized Diploma - Top Tier Schools
+E60-Master's Degree
+E70-Doctorate",APAC ONLY,E60
+Incumbent Data,Employee Data,Gender,The gender of the incumbent.,"M-Male
+F-Female
+U-Undisclosed/Not reported",,F
+Incumbent Data,Employee Data,Date of Birth,The incumbent's date of birth.,"Please enter the date in your normal date format (DD/MM/YY or MM/DD/YY depending on the user default).
+
+If you don't want to enter the actual date please use 1 January.",,1/1/1970
+Incumbent Data,Employee Data,Date of Hire,The incumbent's date of hire.,"Please enter the date in your normal date format (DD/MM/YY or MM/DD/YY depending on the user default).
+
+If you don't want to enter the actual date enter the year of hire.",,7/7/2003
+Incumbent Data,Employee Data,Year of Entry into Business/Industry,Year of entry into the business/industry within your organization and/or another one.,,APAC ONLY,"2,012"
+Incumbent Data,Employee Data,Basic Hours Worked Per Week,The average basic contractual hours worked per week by the incumbent.,"If an incumbent works part-time, convert Annual Base Salary, and all other compensation data elements to full-time equivalents.",EMEA ONLY,20.00
+Incumbent Data,Job Matching Information,,,,,
+Incumbent Data,Job Matching Information,Function Code,"The appropriate three-letter function code (e.g., AHR) for the incumbent's job.",The codes are listed in the Functions and Disciplines section of the Position Descriptions file. All incumbents must have a function code.,,AFB
+Incumbent Data,Job Matching Information,Discipline Code,"The appropriate discipline code for the incumbent's job, consisting of three letters and three digits (e.g., AHR000).",The codes are listed in the Functions and Disciplines section in the Position Descriptions file. All incumbents must have a discipline code.,,AFB010
+Incumbent Data,Job Matching Information,Career Level,The appropriate Career Level for the incumbent's job.,"For applicable career levels, please refer to the Leveling section of the Position Descriptions file. All incumbents must have a career level.",,P4
+Incumbent Data,Job Matching Information,Incumbent Survey Grade,The Survey Grade of the incumbent's job.,"For applicable survey grades, please refer to the Leveling section of the Position Descriptions file. All incumbents must have a survey grade.",,13
+Incumbent Data,Job Matching Information,Job Matching Comments,Any comments that will help in the data cleaning/validation process.,,,Accountant
+Incumbent Data,Job Impact Data,,,,,
+Incumbent Data,Job Impact Data,Modifier: Language,Specifies the required language for which the allowance or premium is paid. This applies to additional spoken languages outside of the local vernacular. Typically English is a requirement in companies for which no allowance is offered.,,,FR
+Incumbent Data,Job Impact Data,Business Unit Name,Name of the business unit where the incumbent sits.,"If corporate employees are included in the submission, one of the business units should be named ""parent"" or ""corporate"" for reporting incumbents with organization-wide responsibility.
+Report incumbents as part of the smallest possible business unit to which they belong (e.g., for a division head within a larger segment, report the name of the division rather than the overall segment).",,Corporate Business
+Incumbent Data,Job Impact Data,Number of Employees Supervised (Direct + Indirect),"The number of employees reporting (directly and indirectly) to the considered incumbent (e.g., for a general manager this number would be all employees in the business; for a function head, the number in the function).",This should only be provided for jobs matched to the M or EX career bands. Figures for jobs below supervision level will be removed.,,"1,000"
+Incumbent Data,Job Impact Data,Corporate/Noncorporate,Segment of the organization in which the incumbent has primary responsibility.,"C-Corporate - Responsibilities span the entire organization. This should not be used for incumbents in a subsidiary, segment, division or region.
+N-Noncorporate - Responsibilities limited to a segment of the organization (e.g., subsidiary, segment, division or product category).
+
+Always report the head of a segment, region, division or country as ""Noncorporate"".",,C
+Incumbent Data,Job Impact Data,Geographic Scope,The geographic scope of the incumbent.,"This should only be provided for jobs matched to the M or EX career bands.
+
+S-Single - single country only
+M-Multi-Country - small cluster of countries
+R-Regional - an entire region, or multiple countries across one or two continents
+G-Global - three or more continents
+
+Select Single country when international responsibility is negligible.
+
+Select Multi-Country when international responsibility is limited to a small cluster of countries, e.g., Benelux, China and Hong Kong, Nordics, UK and Ireland, often grouped under a single legal entity.
+
+Select Regional when international responsibility is significant and covers an entire region, e.g., North America (U.S. and Canada), Western Europe, Middle East and Africa, Greater China (China, Hong Kong and Taiwan), South East Asia (SEA), Latin America, or multiple countries across one or two continents.
+
+Select Global when international responsibility is predominant and covers three or more continents. Parent Geographic Scope should also be Global.",,G
+Incumbent Data,Base Salary,,,,,
+Incumbent Data,Base Salary,Currency of Pay Elements,"The currency code for all pay elements (e.g., Base Salary, Fixed Cash Allowances, Annual Bonus/Incentives, Other Cash).",Refer to the Country Codes tab.,,GBP
+Incumbent Data,Base Salary,Annual Base Salary,"The current full-time equivalent (FTE) annual base salary. Includes any guaranteed additional fixed payments such as holiday pay and any extra-contractual months required by law, collective agreement or organization practice.","Report the full time equivalent (FTE) gross salary amount for each incumbent prior to any deductions (e.g., tax, social security or salary sacrifice), as at their most recent adjustment date. Adjustments include any cost-of-living increase, indexation, merit increase or promotion.
+
+Part-time salaries should be converted to full time.
+
+Does not include fixed cash allowances.
+
+Does not include variable awards such as performance bonus, discretionary bonus, sales incentives, overtime pay, stand-by/call-out pay and shift premiums/payments.
+
+For Russia, please include statutory geographical pay coefficients.","APAC, EMEA ONLY","1,000,000"
+Incumbent Data,Base Salary,Previous Year Annual Base Salary,"The previous year full- time equivalent (FTE) annual base salary. Includes any guaranteed additional fixed payments such as holiday pay and any extra-contractual months required by law, collective agreement or organization practice.","Report the full time equivalent (FTE) gross salary amount for each incumbent excluding any deductions (e.g., tax, social security or salary sacrifice) prior to their most recent adjustment. Adjustments include any cost-of-living increase, indexation, merit increase or promotion.
+
+Part-time salaries should be converted to full time.
+
+Does not include fixed cash allowances.
+
+Does not include variable awards such as performance bonus, discretionary bonus, sales incentives, overtime pay, stand-by/call-out pay and shift premiums/payments.","APAC, EMEA ONLY","65,000"
+Incumbent Data,Base Salary,Monthly Base Salary,"The full-time equivalent (FTE) Monthly Basic Guaranteed Salary or Base Salary, prior to any deductions such as salary sacrifices.","Do NOT include: non-guaranteed overtime, stand-by/call-out pay, shift premium/payments, location premium/allowances, market premium, car allowance, one-off payments and lunch allowances.
+
+Do NOT include: guaranteed additional fixed payments such as holiday pay and any extra-contractual months required by law, collective agreement or organization practice.
+
+Report the full-time equivalent (FTE) monthly base salary for each incumbent prior to any deductions (e.g., tax, social security or salary sacrifice), as at their most recent adjustment date.
+
+Adjustment includes cost-of-living increase, indexation, merit increase and promotion.
+
+Part-time salaries should be converted to full time.
+
+For Brazil, include Adicional de Função here.",LATAM ONLY,"6,860.00"
+Incumbent Data,Base Salary,Base Salary Number of Months,"The number of months of base salary provided annually, including fixed pay such as extra months' pay (i.e., 13th/14th month pay), depending on the country and/or organization's policy. Please refer to the guideline for detailed instructions for Latin America countries.","The number of months of base salary typically range from 12 to 16, depending on the country.
+
+Argentina - Report 13 months. If your company pays other concepts above 13 months, report the additional under Other Fixed Cash Allowances, and enter 13 here.
+
+Brazil - Include the Christmas Bonus here; Vacation Bonus should be reported in the appropriate column.",,13.00
+Incumbent Data,Base Salary,Overtime Compensation Type,The type of overtime compensation arrangement.,"A-All-In Salary - All-Inclusive Salary (no extra overtime compensation). Nature of job requires frequent overtime work and are covered by employment act where employers are obliged to pay overtime. Overtime payment is built into Base Salary.
+G-Guaranteed - Eligible for guaranteed/global overtime compensation
+I-Individual - Eligible for individual (non global) overtime compensation (cash, time off or working time account) based on actual overtime worked (the corresponding amount is not collected in this workbook)
+N-Not eligible",EMEA ONLY,A
+Incumbent Data,Fixed Cash Allowances (Annual Amounts),,,,,
+Incumbent Data,Fixed Cash Allowances (Annual Amounts),Child's Education Allowance per child (as per company policy),Annual education allowance/value if provided.,"Report amount per child received by incumbent. If this is a fixed amount, report the total amount received and indicate 1 in the number of children.",APAC ONLY,"7,500"
+Incumbent Data,Fixed Cash Allowances (Annual Amounts),Child's Education Allowance - Number of Children Covered,Actual number of children covered,Report “1” if Child’s Education Allowance is fixed/total amount,APAC ONLY,3
+Incumbent Data,Fixed Cash Allowances (Annual Amounts),Housing Allowance,Annual housing allowance/value if provided.,"If your organization provides housing for the employee, please report the annual rental cost of the property.",APAC ONLY,"25,000"
+Incumbent Data,Fixed Cash Allowances (Annual Amounts),Language Allowance,"Fixed annual allowance paid as a premium for language skills such as Japanese, Mandarin and others.",,,"1,000"
+Incumbent Data,Fixed Cash Allowances (Annual Amounts),Length of Service Allowance,Annual allowance based on seniority if provided.,Do not report length of service awards in cash or vouchers paid only at anniversary dates (considered a perquisite rather than a fixed cash allowance).,EMEA ONLY,"99,999"
+Incumbent Data,Fixed Cash Allowances (Annual Amounts),Location Allowance,"Annual allowance compensating for being assigned to work in a costly or difficult location. This includes differentials paid to recognize the increased cost of living in a particular town, city or region as well as supplements paid for working in a difficult location (e.g., desert area, extreme climatic conditions).",,"APAC, EMEA ONLY","99,999"
+Incumbent Data,Fixed Cash Allowances (Annual Amounts),Meal Allowance,Annual value of luncheon tickets or meals provided to the incumbent or the annual cost paid by the organization for canteen lunches.,,"APAC, EMEA ONLY","10,000"
+Incumbent Data,Fixed Cash Allowances (Annual Amounts),Medical Allowance,Annual allowance provided for outpatient consultation/treatment.,,INDIA ONLY,"10,000"
+Incumbent Data,Fixed Cash Allowances (Annual Amounts),Representation Allowance,"Annual lump sum paid to cover miscellaneous business expenses for which the organization does not require justification (e.g., entertainment, car parking and related travel expenses, tips, clothing).",,EMEA ONLY,"99,999"
+Incumbent Data,Fixed Cash Allowances (Annual Amounts),Rice Allowance,Annual amount of rice allowance.,,PHILIPPINES ONLY,"10,000"
+Incumbent Data,Fixed Cash Allowances (Annual Amounts),Telecommunication Allowance,"Annual amount of fixed cash communication allowance (e.g., mobile phone) or monthly fixed mobile phone allowance multiplied by 12.",,APAC ONLY,"10,000"
+Incumbent Data,Fixed Cash Allowances (Annual Amounts),Transportation Allowance,Annual transportation allowance/value if provided.,"Transportation to and from work, camp or remote locations such as subsidized company bus, subsidy towards public transportation, or cash allowance to cover the same.
+
+Do not include state subsidized schemes.","APAC, EMEA ONLY","10,000"
+Incumbent Data,Fixed Cash Allowances (Annual Amounts),Vacation Allowance,Annual amount of vacation allowance to cover for vacation travel to the employee's hometown. Typically a lump sum allowance amount in lieu of ticket which is intended to cover the cost of one or multiple journeys to the city of origin. Do not report here vacation ticket reimbursement at cost.,,INDIA ONLY,"99,999"
+Incumbent Data,Fixed Cash Allowances (Annual Amounts),Vacation Bonus,"Annual bonus paid for vacation. May be paid at the time of the vacation period, on a fixed date or anniversary date.","Report the annual amount. Mandatory in Brazil.
+
+If you have your policy defined as a percentage of monthly base salary, you must calculate it and report as an annual amount for each incumbent.
+
+For Brazil this is typically the mandatory one-third (33%) of monthly base salary, but some organizations pay a voluntary amount in excess of the minimum.
+
+Report the full amount including any voluntary amounts in excess of the legal minimum.",BRAZIL ONLY,"99,999"
+Incumbent Data,Fixed Cash Allowances (Annual Amounts),Other Fixed Cash Allowances,The value of any other fixed cash allowances paid during the current annual cycle not already captured such as Skills Allowance.,"Report here less common allowances not collected individually through separate fields such as utilities allowance, rest allowance or furniture allowance. Indicate the name of those allowance(s) under Other Fixed Cash Allowance Type.
+
+Exclude allowances collected through separate fields and benefit-related allowances (e.g., car allowance, pension allowance, flexible benefit allowance).
+
+If not received, do not enter zero, leave blank.",,"99,999"
+Incumbent Data,Fixed Cash Allowances (Annual Amounts),Other Fixed Cash Allowance Type,Items included under Other Fixed Cash Allowances.,,,utilities allowance
+Incumbent Data,Fixed Cash Allowances (Monthly Amounts),,,,,
+Incumbent Data,Fixed Cash Allowances (Monthly Amounts),Hazardous Conditions Allowance (Monthly Amount),"Monthly allowance compensating for working in hazardous conditions due to precarious lodging, difficult working conditions, exposure to dangerous equipment or substances (e.g., inflammables, explosives, high voltage).","For Brazil, this covers ""Adicional de Periculosidade.""",BRAZIL ONLY,"1,000.00"
+Incumbent Data,Fixed Cash Allowances (Monthly Amounts),Health Hazard Allowance (Monthly Amount),"Monthly amount paid to employees for abnormal exposure to noise, vibration, heat, cold, humidity, fumes, radiation, mineral dust, hyperbaric conditions or chemicals/biological agents, i.e., not within the norm considered safe by the applicable health and safety standards (also known as ""Adicional de Insalubridade"" in Brazil).",,BRAZIL ONLY,"1,000.00"
+Incumbent Data,Annual Bonus/Incentives,,,,,
+Incumbent Data,Annual Bonus/Incentives,Eligible for Performance Bonus,"Eligible for performance bonus. This is an incentive scheme with a predetermined performance and reward schedule, whether or not deferred and irrespective of the delivery medium (cash or equity).","Y-Eligible - complete actual and target performance bonus fields.
+N-Not eligible - leave both actual and target performance bonus fields blank.
+
+In situations where partial payments can be annualized as a fair estimate, enter the annualized amount and put ""Y"" under eligible.",,Y
+Incumbent Data,Annual Bonus/Incentives,Target Performance Bonus % of Annual Base Salary,"The target performance bonus or short-term incentive (i.e., to be paid for target/on-budget performance) as a percentage of the current annual base salary.","Based on one year's performance, regardless of whether the award is paid in cash or shares, in full currently, in installments or deferred to future years. If the incumbent does not have a target bonus, leave this field blank.
+
+If the scheme is not a target performance based scheme the information should be provided in the Discretionary Bonus section.",,99.00
+Incumbent Data,Annual Bonus/Incentives,Target Performance Bonus (Annual Amount),"The target annual performance bonus or short-term incentive amount (e.g., to be paid for target/on-budget performance).","Based on one year's performance, regardless of whether the award is paid in cash or shares, in full currently, in installments or deferred to future years. If the incumbent does not have a target bonus, leave this field blank. If the scheme is not a target performance based scheme the information should be provided in the Discretionary Bonus section.","LATAM, INDIA ONLY","9,999"
+Incumbent Data,Annual Bonus/Incentives,Maximum Performance Bonus Amount,The maximum performance bonus under the bonus/annual incentive scheme currently in operation.,"Based on one year's performance, regardless of whether the award is paid in cash or shares, in full currently, in installments or deferred to future years. If the incumbent does not have a maximum bonus, leave this field blank.",INDIA ONLY,"99,999"
+Incumbent Data,Annual Bonus/Incentives,Actual Performance Bonus Amount,The total performance bonus (FTE) earned for the most recent financial year. For incentive plans that generate multiple payments within a single year this should be the total annual amount.,"Include all incentive awards, based on one year's performance, regardless of whether the award is paid in cash or shares, in full immediately, in installments or deferred to future years. For zero receivers who failed the performance threshold input zero (0). For incumbents who received a partial year award, enter the annualized amount. For new hires not eligible to receive an award in the most recent financial year or incumbents who received an award based on a prior position, provide an estimate of the bonus that would have been paid for their current position (e.g., typical amount based on historical or expected payout for the job, e.g., 105% of target).
+
+Do not report here: company-wide profit-sharing payments or recognition awards to select individuals (i.e., when they are not part of a formal annual incentive plan). Discretionary bonus should be reported under appropriate column.",,"9,999"
+Incumbent Data,Annual Bonus/Incentives,Eligible for Sales Incentive Plan,"Eligible for Sales Incentive Plan (e.g., may be referred to as sales bonus, sales incentive, sales commission) that is separate and distinct from a corporate annual incentive or corporate annual bonus plan. (Eligibility typically limited to sales professionals and managers that directly influence sales and based primarily on quantitative measures (e.g., sales, profit, volume) related to individual and/or team sales performance but can, on occasion, include some elements of individual performance objectives that may be qualitative.)","C-Eligible for Commission
+G-Eligible for Goal-Based Incentive
+B-Eligible for both Goal-Based Incentive and Commission
+N-Not Eligible for Goal-Based Incentive and Commission
+
+Goal-Based: incentive earned based on performance relative to a quota, goal or other pre-determined performance objectives; although infrequent, may include goal-based mechanic for performance up to a threshold level (e.g., target, quota or point of excellence) and then commission-based mechanic beyond threshold.
+
+Commission: incentive earned / calculated using a commission rate (e.g., percentage of sales, profit, volume) or flat dollar amount applied to every dollar or unit sold.
+
+Note: The term ""sales commission"" or ""sales bonus"" may be used interchangeably by companies to describe all of the above incentive forms for sales professionals.",,C
+Incumbent Data,Annual Bonus/Incentives,Target Goal-Based Sales Incentive % of Annual Base Salary,"The target sales incentive (i.e., to be paid for target/on-budget performance) as a percentage of the current annual base salary.","If eligibility for Goal-Based Incentive is 'N', do not enter zero; leave blank.
+
+If the incumbent does not have a target, leave this field blank.",,50.00
+Incumbent Data,Annual Bonus/Incentives,Target Goal-Based Sales Incentive (Annual Amount),"The target annual sales incentive amount (e.g., to be paid for target/on-budget performance).","If eligibility for Goal-Based Incentive is 'N', do not enter zero; leave blank.
+
+If the incumbent does not have a target, leave this field blank.
+
+For Brazil, please include the amount related to DSR (""Descanso Semanal Remunerado"" - Weekly Paid Rest) if your company pays it separately.","LATAM, INDIA ONLY","99,999"
+Incumbent Data,Annual Bonus/Incentives,Actual Goal-Based Sales Incentive Amount,The annual sales incentive amount earned for the most recent fiscal year.,"Include all incentive awards, based on one year's performance, regardless of whether the award is paid in cash or shares, in full immediately, in installments or deferred to future years.
+
+For zero receivers who failed the performance threshold, input zero (0). For incumbents who received a partial year award, enter the annualized amount.
+
+For new hires not eligible to receive an award in the most recent financial year or incumbents who received an award based on a prior position, provide an estimate of the bonus that would have been paid for their current position (e.g., typical amount based on historical or expected payout for the job, e.g., 105% of target).
+
+For Brazil, please include the amount related to DSR (""Descanso Semanal Remunerado"" - Weekly Paid Rest) if your company pays it separately.",,"50,000"
+Incumbent Data,Annual Bonus/Incentives,Actual Commission Amount,The annual commission amount earned for the most recent fiscal year.,"If eligibility is 'N', do not enter zero; leave blank. For zero receivers, input zero (0).
+
+For Brazil, please include the amount related to DSR (""Descanso Semanal Remunerado"" - Weekly Paid Rest) if your company pays it separately.",,"99,999"
+Incumbent Data,Annual Bonus/Incentives,Actual Discretionary Bonus Amount,"The annual discretionary bonus amount earned for the most recent fiscal year.
+
+Discretionary bonus. Incentive award without a formal, predetermined performance and reward schedule. This generally covers any form of discretionary bonus such as the annual discretionary bonus arrangements typical in the financial services sector, as well as spot awards recognizing special achievement (e.g., recognition bonus, star award), project completion (e.g., drug launch bonus in the pharmaceutical industry).","Include recognition awards, lump sum awards, alternative reward programs (e.g., gain sharing, team/group incentives or other productivity programs), and discretionary one-off payments (i.e., not part of a normal/regular short-term bonus or incentive plan) for the most recent financial year. If the incumbent did not receive any discretionary payments; leave blank.",,"2,000"
+Incumbent Data,Annual Bonus/Incentives,Target SSO Incentive,"The target annual incentive amount (e.g., paid out based on achievement of pre-determined Service Level Agreements).
+
+Incentives or bonus that are client or project-based, with a monthly or quarterly targets to achieve SLAs such as operational performance excellence, call quality performance, team attendance, customer satisfaction, agent retention.","Enter the total target value of SSO incentive bonus (i.e., cash plus any deferred element).",,"10,000"
+Incumbent Data,Annual Bonus/Incentives,Actual SSO Incentive,"The total SSO incentive amount earned for the last financial/performance year. For amounts paid monthly or quarterly, these should be the total amount.","Include all incentive awards, that may be client-sponsored or project-based. This is different from the Corporate performance bonus. Metrics are typically designed around the type of behaviors that the clients want to reinforce in their outsourced teams, i.e., average call handling time, call resolution, amount collected for those in Credit & Collection function.",,"10,000"
+Incumbent Data,Annual Bonus/Incentives,Target Other Annual Incentives,The target annual amount of other variable pay schemes paid to an incumbent.,This target would not be discretionary.,LATAM ONLY,"10,000"
+Incumbent Data,Annual Bonus/Incentives,Actual Other Annual Incentives,"Any other actual incentive payment in addition to performance bonus, discretionary bonus, goal-based sales incentive, commission and profit-sharing.","Do not include one-off, incumbent-focused payments that are not representative of pay for the job, such as retention/sign-on bonuses, recognition awards, project completion bonuses and other forms of merit pay.
+
+If none received, do not enter zero, leave blank.",,"1,000"
+Incumbent Data,Annual Bonus/Incentives,Other Annual Incentive Type,"The type of annual incentive reported under ""Other Annual Incentive.""",,,
+Incumbent Data,Profit-Sharing,,,,,
+Incumbent Data,Profit-Sharing,Eligible for Profit-Sharing,"Eligible for a cash profit-sharing payment, including voluntary and discretionary employee profit-sharing plans of the organization.","Y-if the incumbent is eligible, even if he/she did not actually receive an award
+N-if the incumbent is not eligible
+
+For France, enter 'Y' only if the organization grants ""Intéressement collectif"" (voluntary profit-sharing) OR if the organization has less than 50 employees and grants ""Participation"" (mandatory profit-sharing).",,Y
+Incumbent Data,Profit-Sharing,Target Profit-Sharing Amount,"The target annual amount to be paid as voluntary company profit-sharing. In Brazil this amount will be established in union agreement. If your organization doesn't have a target for profit-sharing, please report the actual value.",,BRAZIL ONLY,"99,999"
+Incumbent Data,Profit-Sharing,Profit-Sharing - Voluntary,"Amount paid to the employee based on a voluntary organization profit-sharing agreement (e.g., French accord d'intéressement collectif).","If eligibility is No, leave blank. For incumbents who received a partial year award, enter the annualized amount. For new hires not eligible to receive an award in the most recent financial year or incumbents who received an award based on a prior position, provide an estimate of the bonus that would have been paid for their current position.",,"99,999"
+Incumbent Data,Car Benefits,,,,,
+Incumbent Data,Car Benefits,Car Benefit Type,The type of car benefit for which the incumbent is eligible.,"Do not include pool cars or transportation allowances.
+
+C-Company car only
+A-Car Allowance only (in lieu of a company car)
+E-Choice of Company Car or Car Allowance (in lieu of a company car)
+S-Company-Financed or Subsidized Employee Car Purchase LATAM ONLY
+N-Incumbent is not eligible for either a company car or a car allowance
+
+Report only the data element(s) that correspond to the Car Benefit Type selected for each incumbent.
+- If Company Car only (C) is selected, only report the Car Make and Model, Car Purchase Cost, Car Benefit Eligibility Criteria and where applicable, Annual Car Leasing Cost and Car Lease Type.
+- If Annual Car Allowance only (A) is selected, only report the Car Allowance Amount and Car Benefit Eligibility Criteria.
+- If Choice of Company Car or Car Allowance (E) is selected, report both Company Car data elements, Car Allowance Amount and Car Benefit Eligibility Criteria.
+- If Company-financed or subsidized employee car purchase (S) (LATAM ONLY) is selected, only report the Car Purchase Cost and Car Benefit Eligibility Criteria.",,C
+Incumbent Data,Car Benefits,Car Benefit Eligibility Criteria,The criteria for allocating a car benefit.,"S-Eligibility Based on Job Status
+R-Eligibility Based on Nature of Job/Job Requirements",,S
+Incumbent Data,Car Benefits,Car Make and Model,"The make and model, including engine size (in liters), of the car provided to incumbent according to the organization's car policy. The car may be used for business and/or personal use.","Example: enter ""AUDI A4 2.0"" (in this example, Make: AUDI and Model: A4 2.0).
+
+Do not include pool cars.",,AUDI A4 2.0
+Incumbent Data,Car Benefits,Currency of Car Benefit Amounts,The currency code for the reported car benefit amounts.,Refer to the Country Codes tab.,,GBP
+Incumbent Data,Car Benefits,Car Purchase Cost,"The full purchase cost of the car to which the incumbent is entitled, including manufacturer's retail list price plus all purchase taxes.","Report the full purchase cost of the typical car to which the incumbent is entitled (not necessarily the purchase cost of the specific car the incumbent has selected). The full purchase cost includes manufacturer's retail list (pre-discount) price plus all purchase taxes such as VAT and local taxes (e.g., BPM in the Netherlands, TVTS in France, COE in Singapore). Report amount in the currency indicated in the Currency of Car Benefit Amounts element.
+
+Do not include pool cars.",,"99,999"
+Incumbent Data,Car Benefits,Annual Car Leasing Cost,"The annual cost of leasing the car to which the incumbent is entitled regardless of type of car lease. Including any insurance cost. Excluding VAT, local tax and fuel/electricity costs.","Report the typical annual cost of leasing the car to which the incumbent is entitled (not necessarily the annual lease cost of the specific car that incumbent has selected). The full annual leasing cost includes insurance cost and excludes VAT, local taxes and fuel/electricity costs. Report amount in the currency indicated in the Currency of Car Benefit Amounts element.
+Do not include pool cars.",,"9,999"
+Incumbent Data,Car Benefits,Car Lease Type,Type of lease if organization finances company cars through a lease arrangement.,"A-Contract hire/operating lease WITH maintenance (i.e., finance company maintains the car)
+B-Contract hire/operating lease WITHOUT maintenance (i.e., finance company does not have responsibility for maintenance)
+C-Finance lease (i.e., leases that transfer to the lessee substantially all the risks and rewards incidental to ownership of the car. All other leases are contract/hire operating leases. Finance leases do not typically include maintenance.)",,C
+Incumbent Data,Car Benefits,Annual Car Allowance Amount,"The annualized cash amount paid to eligible employees in lieu of a company car.
+
+Includes allowances for all car expenses covered such as, but not limited to, car, fuel/electricity for private use (the trip to and from the work location is considered private use), maintenance, insurance, tolls.
+
+Excludes transportation allowances and fuel/electricity expenses for business use.","Report the total annual sum of allowance(s) for all car expenses covered such as, but not limited to, car, fuel/electricity for private use (the trip to and from the work location is considered private use), maintenance, insurance, tolls. Exclude transportation allowances and fuel/electricity expenses for business use. Report amount in the currency indicated in the Currency of Car Benefit Amounts element.
+
+If your company pays a Car Bonus in lieu of the car, provide the annualized amount (considering the whole period until the next grant), including any additional amount paid separately to cover expenses.",,"9,999"
+Incumbent Data,Other Benefits,,,,,
+Incumbent Data,Other Benefits,Eligible for Retirement Plan,Indicate whether the incumbent is eligible for a participation in a voluntary organization retirement plan. Eligibility aligned with a collective agreement should not be considered voluntary.,"Y-Eligible
+N-Not eligible","APAC, EMEA ONLY",Y
+Incumbent Data,Other Benefits,Organization Contribution to Pension Plan/Retirement,The annual value of the retirement fund contribution PAID BY THE ORGANIZATION for voluntary organization pension/retirement plans. Do not include here mandatory contributions to state pensions or contributions to plans defined by collective agreements.,,APAC ONLY,"2,000"
+Incumbent Data,LTI Eligibility,,,,,
+Incumbent Data,LTI Eligibility,Eligible for Long-Term Incentive,Eligibility for long-term incentives.,"Y-if the incumbent is eligible, even if no award was granted.
+N-if the incumbent is not eligible.",,Y
+Incumbent Data,Long-Term Incentives Plan Data ,,,,,
+Incumbent Data,Long-Term Incentives Plan Data ,Long-Term Incentive Plan Type,Type of long-term grant data being reported.,"PP-Performance Plan Awards: Performance Plan Awards are contingent grants of cash or stock that are earned in whole or in part according to the degree of achievement of performance goals over a defined period (usually three years). In EMEA, some grants can be contingent upon bonus deferral (deferred bonus matching plans) or the purchase of company stock (co-investment plans).
+
+RS-Restricted Stock/Stock Units: Restricted Stock/Stock Units are grants of stock or stock units at no or nominal cost. The restrictions and risk of forfeiture lapse with continued employment over a period of years. If vesting also includes a performance condition, such condition is considered to be nominal with a high likelihood of being attained. Dividends or dividend equivalents may be paid or accrued during the restricted period.
+
+SO-Stock Options/SARs: Stock Options are rights to purchase a fixed number of shares of a company's stock, at a stated price for a specified period of time. Stock Appreciation Rights (SARs) are rights to receive payment equal in value to the appreciation on a share of stock between the date on which the SAR was granted and the date on which the employee exercises his/her appreciation rights.",,PP
+Incumbent Data,Long-Term Incentives Plan Data ,Grant Date,Date the grant was made.,"Provide date of grants in the last 12 months. Enter the date in your normal date format (DD/MM/YY or MM/DD/YY depending on user default).
+
+For special grants provided in lieu of annual grants and for multi-year or mega grants, please enter your most recent grant which could be more than 12 months ago.",,1/3/2023
+Incumbent Data,Long-Term Incentives Plan Data ,Grant Price Currency,The currency code for the grant.,"Enter the currency for the grant price reported. For example, enter USD for U.S. Dollars, CAD for Canadian Dollars, EUR for Euros, CHF for Swiss Francs and GBP for Pounds Sterling.
+
+For performance cash plans this is the currency in which the cash award is expressed.",,GBP
+Incumbent Data,Long-Term Incentives Plan Data ,Grant Price Per Share/Unit,Price of the share or unit at the time of grant.,"Round all prices to two decimal places (e.g., 12.125 should be entered as 12.13). If you are reporting a performance cash plan, co-investment shares and/or deferred bonus matching shares enter 1.00.",,50.00
+Incumbent Data,Long-Term Incentives Plan Data ,Accounting Value per Share/Unit of Award,"For each share-based award, please enter the Fair Value of the award at the date of grant. The Fair Value is the per share value of the award at grant as calculated under International Financial Reporting Standards - IFRS(2) or the equivalent under local country GAAP. Please note that this grant-date Fair Value may be provided by your finance department.","If you are reporting a performance cash award, enter 1.00.
+Values should reflect the grant date accounting value per unit of the award (e.g., 52.25 for a single performance share). All values should be rounded to two decimal places (e.g., 52.2512 should be entered as 52.25). The currency should be the same as the Grant Price Currency.",,52.25
+Incumbent Data,Long-Term Incentives Plan Data ,Number of Shares/Units Granted,"The number of options, shares or units granted.
+ 
+For performance plans, the values provided should be shares/cash/units for the upcoming cycle, not payouts from the cycle that just ended.","Do not report actual payouts or awards for the cycle that just ended.
+
+For newly hired employees or those near retirement who are long-term incentive eligible but did not receive a grant, enter an estimate. For performance unit or share plans, enter the target award opportunity (for defined target plans) or maximum award opportunity (for defined maximum plans) for the cycle that started most recently.
+
+For performance cash, co-investment shares and deferred bonus matching plans, for convenience and as a convention, report the full award value and enter 1.00 under grant price per share/unit.
+
+For Performance Cash plans, enter the target award (e.g., if an incumbent could earn 100% of base salary if target performance is achieved and the incumbent's base salary is 200,000, enter 200,000 and use the Base Salary currency as the Grant Price Currency).
+
+For Co-Investment Shares, report the maximum opportunity multiplied by the maximum share-matching on that investment. For example, if the maximum investment opportunity is 50% of a 200,000 base salary and the company will match a maximum of 50% of that investment, the award value is 50% x 200,000 x 50% = 50,000.
+
+For Deferred Bonus Matching Shares, report the maximum deferral opportunity (compulsory and/or voluntary) multiplied by the maximum company match on that deferral. For example, if the incumbent can defer up to 50% of a 100,000 target bonus and the company will match 100%, the award value is 50% x 100,000 x 100% = 50,000.",,"10,000"
