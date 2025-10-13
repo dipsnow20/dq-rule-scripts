@@ -1,176 +1,221 @@
-# Production-Ready T-SQL Data Quality Framework Documentation
+# Optimized T-SQL Data Quality Validation Script Documentation
 
 ## Overview
 
-This document provides comprehensive documentation for the optimized and consolidated T-SQL Data Quality Framework. The framework has been designed to be production-ready, efficient, and maintainable.
+This document provides comprehensive documentation for the consolidated and optimized T-SQL data quality validation script. The script has been designed for production environments with enhanced error handling, performance optimization, and detailed logging capabilities.
 
-## Summary of Quality Checks
+## Script Information
 
-| Check Name | Purpose | Status |
-|------------|---------|--------|
-| NULL Value Validation | Validates that non-nullable columns do not contain NULL values | Optimized |
-| Data Type Validation | Ensures data in numeric columns is properly formatted and valid | Optimized |
-| Referential Integrity Check | Validates foreign key relationships and identifies orphaned records | Optimized |
-| Future Date Check | Business rule validation to prevent future dates in historical columns | New |
-| Unique Constraint Check | Validates data consistency and uniqueness constraints | Optimized |
-| Comprehensive Logging | Centralized logging mechanism for all quality checks | New |
-| Error Handling Framework | Robust error handling with transaction safety | New |
-| Performance Optimization | Set-based operations and efficient query patterns | Optimized |
-| Execution Summary Reporting | Detailed reporting of check results and performance metrics | New |
+- **Script Name**: `Output_DI_OptimiseTSQLScript.sql`
+- **Version**: 1.0
+- **Purpose**: Comprehensive data quality validation across multiple tables
+- **Target Environment**: SQL Server (2016 and later)
 
-## Key Features
+## Tables Validated
 
-### 1. Production-Ready Design
-- **Idempotent Operations**: All scripts can be safely re-run without side effects
-- **Transaction Safety**: Proper error handling prevents partial updates
-- **Comprehensive Logging**: All operations are logged with detailed metadata
-- **Performance Optimized**: Uses set-based operations instead of cursors where possible
+- `dbo.SurveyData` - Survey response data
+- `dbo.JobData` - Job role definitions
+- `dbo.EmployeeData` - Employee information
+- `dbo.Countries` - Reference table for country codes
 
-### 2. Modular Architecture
-- **Pre-Check Setup**: Initializes logging tables and configuration
-- **Quality Checks**: Organized by check type with consistent patterns
-- **Error Handling**: Centralized error capture and reporting
-- **Summary Reporting**: Comprehensive execution summary and results
+## Quality Checks Summary
 
-### 3. Comprehensive Coverage
-- **Data Completeness**: NULL value validation
-- **Data Type Integrity**: Validates data types and formats
-- **Referential Integrity**: Foreign key relationship validation
-- **Business Rule Validation**: Customizable business logic checks
-- **Data Consistency**: Uniqueness and constraint validation
+| Check Name | Purpose | Status | Table | Column(s) |
+|------------|---------|--------|-------|----------|
+| Null_SurveyID_Check | Validates SurveyID is not null (Primary Key) | Optimized | SurveyData | SurveyID |
+| Null_JobCode_Check | Validates JobCode is not null (Primary Key) | Optimized | JobData | JobCode |
+| Null_EmployeeID_Check | Validates EmployeeID is not null (Primary Key) | Optimized | EmployeeData | EmployeeID |
+| Unique_JobCode_Check | Ensures JobCode uniqueness within table | Optimized | JobData | JobCode |
+| Unique_EmployeeID_Check | Ensures EmployeeID uniqueness within table | Optimized | EmployeeData | EmployeeID |
+| Valid_CountryCode_Check | Validates referential integrity with Countries table | Optimized | SurveyData | CountryCode |
+| Positive_BaseSalary_Check | Ensures BaseSalary is positive and greater than zero | Optimized | SurveyData | BaseSalary |
+| Valid_JobFamily_Check | Validates JobFamily against allowed values list | Optimized | JobData | JobFamily |
+| Valid_CurrencyCode_Format_Check | Validates CurrencyCode follows ISO 4217 format (3 chars) | Optimized | SurveyData | CurrencyCode |
+| Valid_Email_Format_Check | Validates email format using pattern matching | Optimized | EmployeeData | Email |
+| Non_Future_SurveyDate_Check | Ensures SurveyDate is not in the future | Optimized | SurveyData | SurveyDate |
+| HireDate_vs_TerminationDate_Check | Validates HireDate is before TerminationDate | Optimized | EmployeeData | HireDate, TerminationDate |
+
+## Key Optimizations Implemented
+
+### 1. **Consolidation & Efficiency**
+- **Merged Related Checks**: Combined similar validation patterns (null checks, uniqueness checks) into consolidated sections
+- **Set-Based Operations**: All checks use efficient set-based queries instead of row-by-row processing
+- **Single Execution Flow**: All checks execute in one script run, reducing overhead
+- **Optimized Queries**: Used EXISTS instead of JOINs where appropriate for better performance
+
+### 2. **Production Readiness Enhancements**
+- **Comprehensive Error Handling**: TRY-CATCH blocks with detailed error logging
+- **Transaction Safety**: All operations are read-only, ensuring no data corruption risk
+- **Idempotent Design**: Script can be safely re-run multiple times
+- **Configurable Parameters**: Enable/disable logging and detailed output via variables
+
+### 3. **Logging & Monitoring**
+- **Centralized Results**: All check results stored in temporary tables for analysis
+- **Performance Metrics**: Execution time tracking for each check
+- **Violation Details**: Optional detailed violation records for troubleshooting
+- **Summary Reporting**: Comprehensive summary with pass/fail counts and timing
+
+### 4. **Code Quality Improvements**
+- **Standardized Naming**: Consistent naming conventions across all checks
+- **Comprehensive Documentation**: Inline comments and section headers
+- **Parameterization**: Configurable options for different execution modes
+- **Clean Resource Management**: Proper cleanup of temporary objects
 
 ## Usage Instructions
 
-### Prerequisites
-- SQL Server 2016 or later (uses STRING_AGG function)
-- Appropriate database permissions (CREATE TABLE, SELECT, INSERT)
-- Database context set to target database
-
-### Execution Steps
-
-1. **Review and Customize**:
-   ```sql
-   -- Customize business rule tables in the script
-   INSERT INTO @FutureDateTables VALUES 
-       ('YourTable', 'YourDateColumn');
-   ```
-
-2. **Execute the Script**:
-   ```sql
-   -- Run the complete framework
-   EXEC [Path_to_Script]/Output_DI_OptimiseTSQLScript.sql
-   ```
-
-3. **Review Results**:
-   ```sql
-   -- Check execution results
-   SELECT * FROM DataQualityLog 
-   WHERE ExecutionId = 'YourExecutionId'
-   ORDER BY ExecutionTime DESC;
-   ```
+### Basic Execution
+```sql
+-- Execute with default settings (logging enabled, detailed output enabled)
+EXEC sqlcmd -i "Output_DI_OptimiseTSQLScript.sql"
+```
 
 ### Configuration Options
 
-#### Custom Business Rules
-To add custom business rules, modify the business rule validation section:
+Modify these variables at the top of the script to customize behavior:
 
 ```sql
--- Add your custom tables and columns
-INSERT INTO @FutureDateTables VALUES 
-    ('Orders', 'OrderDate'),
-    ('Invoices', 'InvoiceDate'),
-    ('YourCustomTable', 'YourDateColumn');
+DECLARE @EnableLogging BIT = 1;     -- Set to 0 to disable detailed logging
+DECLARE @DetailedOutput BIT = 1;    -- Set to 0 to hide violation details
 ```
 
-#### Logging Retention
-To manage log retention, add a cleanup job:
+### Output Interpretation
 
-```sql
--- Clean up logs older than 30 days
-DELETE FROM DataQualityLog 
-WHERE ExecutionTime < DATEADD(DAY, -30, GETDATE());
-```
+#### Summary Section
+- **Total Checks Executed**: Number of validation rules run
+- **Checks Passed**: Number of rules with zero violations
+- **Checks Failed**: Number of rules with violations found
+- **Overall Status**: PASSED (no violations) or FAILED (violations found)
+- **Total Execution Time**: Complete script execution time in milliseconds
 
-## Output Interpretation
+#### Detailed Results
+For each check, the following information is provided:
+- **CheckID**: Unique identifier for the validation rule
+- **CheckName**: Descriptive name of the validation
+- **TableName**: Target table being validated
+- **ColumnName**: Column(s) being validated
+- **RuleDescription**: Business rule being enforced
+- **ViolationCount**: Number of records violating the rule
+- **CheckStatus**: PASSED, FAILED, or ERROR
+- **ExecutionTime_MS**: Individual check execution time
+- **CheckTimestamp**: When the check was executed
 
-### Execution Summary
-The script returns a summary with the following fields:
-- **ExecutionId**: Unique identifier for the execution
-- **OverallStatus**: PASSED, PASSED_WITH_WARNINGS, or FAILED
-- **TotalChecks**: Number of checks executed
-- **ErrorCount**: Number of checks that found errors
-- **WarningCount**: Number of checks that found warnings
+#### Violation Details (Optional)
+When `@DetailedOutput = 1`, additional details are provided:
+- **ViolationID**: Unique identifier for each violation
+- **PrimaryKey**: Primary key of the violating record
+- **ViolationDetails**: Specific details about the violation
 
-### Severity Levels
-- **ERROR**: Critical issues that must be addressed
-- **WARNING**: Issues that should be reviewed but may not be critical
-- **INFO**: Informational messages indicating successful checks
+## Prerequisites
 
-### Log Table Schema
-```sql
-CREATE TABLE DataQualityLog (
-    LogId BIGINT IDENTITY(1,1) PRIMARY KEY,
-    ExecutionId UNIQUEIDENTIFIER NOT NULL,
-    CheckName NVARCHAR(255) NOT NULL,
-    CheckType NVARCHAR(100) NOT NULL,
-    TableName NVARCHAR(255),
-    ColumnName NVARCHAR(255),
-    Severity NVARCHAR(20) NOT NULL,
-    ErrorCount INT DEFAULT 0,
-    ErrorMessage NVARCHAR(MAX),
-    SampleBadData NVARCHAR(MAX),
-    ExecutionTime DATETIME2 DEFAULT GETDATE(),
-    Duration_MS INT
-);
-```
+### Database Objects
+- All target tables (`SurveyData`, `JobData`, `EmployeeData`) must exist
+- Reference table `Countries` must exist with `CountryCode` column
+- Tables should have appropriate indexes on columns being validated
+
+### Permissions
+- `SELECT` permissions on all target tables
+- `CREATE TABLE` permissions for temporary objects (typically granted to all users)
+
+### SQL Server Version
+- SQL Server 2016 or later (uses `DATETIME2` data type)
+- Compatible with Azure SQL Database
 
 ## Performance Considerations
 
-### Optimization Techniques Used
-1. **Set-Based Operations**: Eliminates row-by-row processing
-2. **Dynamic SQL**: Allows for flexible, reusable checks
-3. **Indexed Logging**: Efficient querying of historical results
-4. **Parameterized Queries**: Prevents SQL injection and improves performance
+### Recommended Indexes
+For optimal performance, ensure the following indexes exist:
 
-### Monitoring Recommendations
-- Monitor execution duration trends
-- Set up alerts for ERROR severity issues
-- Review WARNING items regularly
-- Archive old log data based on retention policies
+```sql
+-- SurveyData table
+CREATE INDEX IX_SurveyData_CountryCode ON dbo.SurveyData(CountryCode);
+CREATE INDEX IX_SurveyData_SurveyDate ON dbo.SurveyData(SurveyDate);
 
-## Maintenance and Extension
+-- JobData table
+CREATE UNIQUE INDEX IX_JobData_JobCode ON dbo.JobData(JobCode);
+CREATE INDEX IX_JobData_JobFamily ON dbo.JobData(JobFamily);
 
-### Adding New Checks
-1. Follow the established pattern for error handling
-2. Use the `#LogQualityCheck` procedure for consistent logging
-3. Include appropriate BEGIN TRY/END TRY blocks
-4. Test thoroughly before production deployment
+-- EmployeeData table
+CREATE UNIQUE INDEX IX_EmployeeData_EmployeeID ON dbo.EmployeeData(EmployeeID);
+CREATE INDEX IX_EmployeeData_Email ON dbo.EmployeeData(Email);
 
-### Customization Guidelines
-- Modify business rule sections for organization-specific requirements
-- Adjust severity levels based on business impact
-- Add custom check types as needed
-- Maintain consistent naming conventions
+-- Countries reference table
+CREATE UNIQUE INDEX IX_Countries_CountryCode ON dbo.Countries(CountryCode);
+```
+
+### Execution Time Expectations
+- Small datasets (< 10K records): < 1 second
+- Medium datasets (10K - 100K records): 1-5 seconds
+- Large datasets (100K - 1M records): 5-30 seconds
+- Very large datasets (> 1M records): 30+ seconds
 
 ## Troubleshooting
 
 ### Common Issues
-1. **Permission Errors**: Ensure proper database permissions
-2. **Missing Tables**: Script handles missing tables gracefully
-3. **Performance Issues**: Consider running during off-peak hours for large databases
-4. **Log Table Growth**: Implement regular cleanup procedures
 
-### Support Information
-- Review execution logs for detailed error information
-- Check SQL Server error logs for system-level issues
-- Validate database schema changes that might affect checks
+1. **Missing Reference Table**
+   - Error: "Invalid object name 'dbo.Countries'"
+   - Solution: Create the Countries reference table or modify the script to skip referential integrity checks
 
-## Version History
+2. **Permission Denied**
+   - Error: "SELECT permission denied on object..."
+   - Solution: Grant SELECT permissions on all target tables
 
-| Version | Date | Changes |
-|---------|------|----------|
-| 1.0 | 2024 | Initial production-ready framework |
+3. **Timeout Issues**
+   - Error: "Timeout expired"
+   - Solution: Add appropriate indexes or increase query timeout settings
+
+### Performance Tuning
+
+1. **Disable Detailed Output** for large datasets:
+   ```sql
+   DECLARE @DetailedOutput BIT = 0;
+   ```
+
+2. **Add Indexes** on frequently validated columns
+
+3. **Run During Off-Peak Hours** for large datasets
+
+4. **Consider Partitioning** for very large tables
+
+## Maintenance
+
+### Regular Tasks
+- Review violation patterns monthly
+- Update allowed values lists as business rules change
+- Monitor execution times and optimize as needed
+- Archive detailed violation logs periodically
+
+### Script Updates
+- Add new validation rules by following the existing pattern
+- Update business rules (e.g., JobFamily allowed values) as needed
+- Enhance error handling based on production experience
+
+## Integration with CI/CD
+
+The script can be integrated into automated deployment pipelines:
+
+```yaml
+# Example Azure DevOps pipeline step
+- task: SqlAzureDacpacDeployment@1
+  displayName: 'Run Data Quality Checks'
+  inputs:
+    azureSubscription: '$(azureSubscription)'
+    ServerName: '$(sqlServerName)'
+    DatabaseName: '$(databaseName)'
+    SqlFile: 'Output_DI_OptimiseTSQLScript.sql'
+    additionalArguments: '-v EnableLogging=1 DetailedOutput=0'
+```
+
+## Support and Contact
+
+For questions or issues with this script:
+- Review this documentation first
+- Check the troubleshooting section
+- Contact the Data Engineering team
+- Submit issues through your organization's standard support channels
 
 ---
 
-*This framework provides a solid foundation for data quality monitoring in production environments. Regular review and customization based on specific business requirements will ensure optimal effectiveness.*
+**Document Version**: 1.0  
+**Last Updated**: 2024  
+**Author**: Data Engineering Team
