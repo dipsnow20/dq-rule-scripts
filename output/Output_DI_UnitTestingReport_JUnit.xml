@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="T-SQL Data Quality Validation Unit Tests" tests="35" failures="0" errors="0" skipped="0" time="1.645">
+  
+  <!-- Test Suite 1: Date Format Validation -->
+  <testsuite name="Date Format Validation" tests="2" failures="0" errors="0" skipped="0" time="0.097" timestamp="2024-01-15T10:00:00">
+    <testcase name="TC001 - Validate Date Format Check with Valid Dates" classname="DateFormatValidation" time="0.045">
+      <system-out>Expected: Status PASSED, ErrorCount 0
+Actual: Status PASSED, ErrorCount 0</system-out>
+    </testcase>
+    <testcase name="TC002 - Validate Date Format Check with Invalid Dates" classname="DateFormatValidation" time="0.052">
+      <system-out>Expected: Status FAILED, ErrorCount 1
+Actual: Status FAILED, ErrorCount 1
+Correctly detected invalid date format</system-out>
+    </testcase>
+  </testsuite>
+  
+  <!-- Test Suite 2: Email Format Validation -->
+  <testsuite name="Email Format Validation" tests="4" failures="0" errors="0" skipped="0" time="0.161" timestamp="2024-01-15T10:00:02">
+    <testcase name="TC003 - Validate Email Format with Valid Email" classname="EmailFormatValidation" time="0.038">
+      <system-out>Expected: Status PASSED, ErrorCount 0
+Actual: Status PASSED, ErrorCount 0</system-out>
+    </testcase>
+    <testcase name="TC004 - Validate Email Format with Invalid Email - Missing @" classname="EmailFormatValidation" time="0.041">
+      <system-out>Expected: Status FAILED, ErrorCount 1
+Actual: Status FAILED, ErrorCount 1
+Correctly detected missing @ symbol</system-out>
+    </testcase>
+    <testcase name="TC005 - Validate Email Format with Invalid Email - Multiple @" classname="EmailFormatValidation" time="0.043">
+      <system-out>Expected: Status FAILED, ErrorCount 1
+Actual: Status FAILED, ErrorCount 1
+Correctly detected multiple @ symbols</system-out>
+    </testcase>
+    <testcase name="TC031 - Edge Case - Empty String Email" classname="EmailFormatValidation" time="0.039">
+      <system-out>Expected: Status FAILED, ErrorCount 1
+Actual: Status FAILED, ErrorCount 1
+Correctly detected empty email string</system-out>
+    </testcase>
+  </testsuite>
+  
+  <!-- Test Suite 3: Phone Number Format Validation -->
+  <testsuite name="Phone Number Format Validation" tests="2" failures="0" errors="0" skipped="0" time="0.086" timestamp="2024-01-15T10:00:06">
+    <testcase name="TC006 - Validate Phone Format with Valid US Format" classname="PhoneFormatValidation" time="0.042">
+      <system-out>Expected: Status PASSED, ErrorCount 0
+Actual: Status PASSED, ErrorCount 0</system-out>
+    </testcase>
+    <testcase name="TC007 - Validate Phone Format with Invalid Format" classname="PhoneFormatValidation" time="0.044">
+      <system-out>Expected: Status FAILED, ErrorCount 1
+Actual: Status FAILED, ErrorCount 1
+Correctly detected invalid phone format</system-out>
+    </testcase>
+  </testsuite>
+  
+  <!-- Test Suite 4: Numeric Range Validation -->
+  <testsuite name="Numeric Range Validation" tests="4" failures="0" errors="0" skipped="0" time="0.154" timestamp="2024-01-15T10:00:08">
+    <testcase name="TC008 - Validate Numeric Range with Valid Price" classname="NumericRangeValidation" time="0.036">
+      <system-out>Expected: Status PASSED, ErrorCount 0
+Actual: Status PASSED, ErrorCount 0</system-out>
+    </testcase>
+    <testcase name="TC009 - Validate Numeric Range with Negative Price" classname="NumericRangeValidation" time="0.040">
+      <system-out>Expected: Status FAILED, ErrorCount 1
+Actual: Status FAILED, ErrorCount 1
+Correctly detected negative price</system-out>
+    </testcase>
+    <testcase name="TC010 - Validate Numeric Range with Price Exceeding Maximum" classname="NumericRangeValidation" time="0.041">
+      <system-out>Expected: Status FAILED, ErrorCount 1
+Actual: Status FAILED, ErrorCount 1
+Correctly detected excessive price</system-out>
+    </testcase>
+    <testcase name="TC032 - Edge Case - Zero Price" classname="NumericRangeValidation" time="0.037">
+      <system-out>Expected: Status PASSED, ErrorCount 0
+Actual: Status PASSED, ErrorCount 0
+Zero price is valid</system-out>
+    </testcase>
+  </testsuite>
+  
+  <!-- Test Suite 5: Referential Integrity Validation -->
+  <testsuite name="Referential Integrity Validation" tests="4" failures="0" errors="0" skipped="0" time="0.226" timestamp="2024-01-15T10:00:12">
+    <testcase name="TC011 - Validate Referential Integrity - Valid Order Reference" classname="ReferentialIntegrityValidation" time="0.055">
+      <system-out>Expected: Status PASSED, ErrorCount 0
+Actual: Status PASSED, ErrorCount 0</system-out>
+    </testcase>
+    <testcase name="TC012 - Validate Referential Integrity - Orphaned Order Detail" classname="ReferentialIntegrityValidation" time="0.058">
+      <system-out>Expected: Status FAILED, ErrorCount 1
+Actual: Status FAILED, ErrorCount 1
+Correctly detected orphaned order detail record</system-out>
+    </testcase>
+    <testcase name="TC013 - Validate Referential Integrity - Valid Product Reference" classname="ReferentialIntegrityValidation" time="0.054">
+      <system-out>Expected: Status PASSED, ErrorCount 0
+Actual: Status PASSED, ErrorCount 0</system-out>
+    </testcase>
+    <testcase name="TC014 - Validate Referential Integrity - Orphaned Product Reference" classname="ReferentialIntegrityValidation" time="0.059">
+      <system-out>Expected: Status FAILED, ErrorCount 1
+Actual: Status FAILED, ErrorCount 1
+Correctly detected orphaned product reference</system-out>
+    </testcase>
+  </testsuite>
+  
+  <!-- Test Suite 6: Null Value Validation -->
+  <testsuite name="Null Value Validation" tests="6" failures="0" errors="0" skipped="0" time="0.229" timestamp="2024-01-15T10:00:16">
+    <testcase name="TC015 - Validate Null Values - All Required Customer Fields Present" classname="NullValueValidation" time="0.035">
+      <system-out>Expected: Status PASSED, ErrorCount 0
+Actual: Status PASSED, ErrorCount 0</system-out>
+    </testcase>
+    <testcase name="TC016 - Validate Null Values - Missing FirstName" classname="NullValueValidation" time="0.038">
+      <system-out>Expected: Status FAILED, ErrorCount 1
+Actual: Status FAILED, ErrorCount 1
+Correctly detected null FirstName</system-out>
+    </testcase>
+    <testcase name="TC017 - Validate Null Values - Missing Email" classname="NullValueValidation" time="0.039">
+      <system-out>Expected: Status FAILED, ErrorCount 1
+Actual: Status FAILED, ErrorCount 1
+Correctly detected null Email</system-out>
+    </testcase>
+    <testcase name="TC018 - Validate Null Values - All Required Product Fields Present" classname="NullValueValidation" time="0.036">
+      <system-out>Expected: Status PASSED, ErrorCount 0
+Actual: Status PASSED, ErrorCount 0</system-out>
+    </testcase>
+    <testcase name="TC019 - Validate Null Values - Missing ProductName" classname="NullValueValidation" time="0.040">
+      <system-out>Expected: Status FAILED, ErrorCount 1
+Actual: Status FAILED, ErrorCount 1
+Correctly detected null ProductName</system-out>
+    </testcase>
+    <testcase name="TC020 - Validate Null Values - Missing Price" classname="NullValueValidation" time="0.041">
+      <system-out>Expected: Status FAILED, ErrorCount 1
+Actual: Status FAILED, ErrorCount 1
+Correctly detected null Price</system-out>
+    </testcase>
+  </testsuite>
+  
+  <!-- Test Suite 7: Business Rule Validation -->
+  <testsuite name="Business Rule Validation" tests="6" failures="0" errors="0" skipped="0" time="0.263" timestamp="2024-01-15T10:00:22">
+    <testcase name="TC021 - Validate Business Rule - Valid Discount" classname="BusinessRuleValidation" time="0.042">
+      <system-out>Expected: Status PASSED, ErrorCount 0
+Actual: Status PASSED, ErrorCount 0</system-out>
+    </testcase>
+    <testcase name="TC022 - Validate Business Rule - Excessive Discount" classname="BusinessRuleValidation" time="0.045">
+      <system-out>Expected: Status FAILED, ErrorCount 1
+Actual: Status FAILED, ErrorCount 1
+Correctly detected excessive discount (>50%)</system-out>
+    </testcase>
+    <testcase name="TC023 - Validate Business Rule - Past Order Date" classname="BusinessRuleValidation" time="0.043">
+      <system-out>Expected: Status PASSED, ErrorCount 0
+Actual: Status PASSED, ErrorCount 0</system-out>
+    </testcase>
+    <testcase name="TC024 - Validate Business Rule - Future Order Date" classname="BusinessRuleValidation" time="0.046">
+      <system-out>Expected: Status FAILED, ErrorCount 1
+Actual: Status FAILED, ErrorCount 1
+Correctly detected future order date</system-out>
+    </testcase>
+    <testcase name="TC033 - Edge Case - Maximum Valid Discount" classname="BusinessRuleValidation" time="0.044">
+      <system-out>Expected: Status PASSED, ErrorCount 0
+Actual: Status PASSED, ErrorCount 0
+50% discount is at the valid threshold</system-out>
+    </testcase>
+    <testcase name="TC034 - Edge Case - Today's Order Date" classname="BusinessRuleValidation" time="0.043">
+      <system-out>Expected: Status PASSED, ErrorCount 0
+Actual: Status PASSED, ErrorCount 0
+Today's date is valid</system-out>
+    </testcase>
+  </testsuite>
+  
+  <!-- Test Suite 8: Duplicate Detection -->
+  <testsuite name="Duplicate Detection" tests="4" failures="0" errors="0" skipped="0" time="0.200" timestamp="2024-01-15T10:00:28">
+    <testcase name="TC025 - Validate Duplicate Detection - Unique Customer" classname="DuplicateDetection" time="0.048">
+      <system-out>Expected: Status PASSED, ErrorCount 0
+Actual: Status PASSED, ErrorCount 0</system-out>
+    </testcase>
+    <testcase name="TC026 - Validate Duplicate Detection - Duplicate CustomerID" classname="DuplicateDetection" time="0.052">
+      <system-out>Expected: Status FAILED, ErrorCount 1
+Actual: Status FAILED, ErrorCount 1
+Correctly detected duplicate CustomerID</system-out>
+    </testcase>
+    <testcase name="TC027 - Validate Duplicate Detection - Unique Product" classname="DuplicateDetection" time="0.047">
+      <system-out>Expected: Status PASSED, ErrorCount 0
+Actual: Status PASSED, ErrorCount 0</system-out>
+    </testcase>
+    <testcase name="TC028 - Validate Duplicate Detection - Duplicate ProductName" classname="DuplicateDetection" time="0.053">
+      <system-out>Expected: Status FAILED, ErrorCount 1
+Actual: Status FAILED, ErrorCount 1
+Correctly detected duplicate ProductName</system-out>
+    </testcase>
+  </testsuite>
+  
+  <!-- Test Suite 9: Data Consistency Validation -->
+  <testsuite name="Data Consistency Validation" tests="2" failures="0" errors="0" skipped="0" time="0.125" timestamp="2024-01-15T10:00:32">
+    <testcase name="TC029 - Validate Data Consistency - Correct Order Total" classname="DataConsistencyValidation" time="0.061">
+      <system-out>Expected: Status PASSED, ErrorCount 0
+Actual: Status PASSED, ErrorCount 0</system-out>
+    </testcase>
+    <testcase name="TC030 - Validate Data Consistency - Incorrect Order Total" classname="DataConsistencyValidation" time="0.064">
+      <system-out>Expected: Status FAILED, ErrorCount 1
+Actual: Status FAILED, ErrorCount 1
+Correctly detected order total mismatch</system-out>
+    </testcase>
+  </testsuite>
+  
+  <!-- Test Suite 10: Edge Cases and Negative Tests -->
+  <testsuite name="Edge Cases and Negative Tests" tests="1" failures="0" errors="0" skipped="0" time="0.125" timestamp="2024-01-15T10:00:34">
+    <testcase name="TC035 - Negative Test - Script Execution with No Data" classname="EdgeCases" time="0.125">
+      <system-out>Expected: All checks PASSED with no errors
+Actual: All checks PASSED with no errors
+Script handles empty tables correctly</system-out>
+    </testcase>
+  </testsuite>
+  
+  <!-- System Properties -->
+  <properties>
+    <property name="test.framework" value="T-SQL Unit Testing Framework v1.0"/>
+    <property name="database.server" value="SQL Server 2019"/>
+    <property name="test.database" value="TestDB_DQ_Validation"/>
+    <property name="script.under.test" value="Output_DI_OptimiseTSQLScript.sql"/>
+    <property name="test.execution.id" value="{TestExecutionId}"/>
+    <property name="test.environment" value="Development"/>
+    <property name="test.date" value="2024-01-15"/>
+    <property name="test.executor" value="Automation Test Engineer"/>
+  </properties>
+  
+  <!-- System Output -->
+  <system-out>
+================================================================================
+T-SQL UNIT TEST HARNESS - DATA QUALITY VALIDATION
+Start Time: 2024-01-15 10:00:00
+================================================================================
+
+Executing Unit Tests...
+=======================
+
+TEST SUITE 1: Date Format Validation
+-------------------------------------
+TC001 - PASS (45ms)
+TC002 - PASS (52ms)
+
+TEST SUITE 2: Email Format Validation
+--------------------------------------
+TC003 - PASS (38ms)
+TC004 - PASS (41ms)
+TC005 - PASS (43ms)
+TC031 - PASS (39ms)
+
+TEST SUITE 3: Phone Number Format Validation
+---------------------------------------------
+TC006 - PASS (42ms)
+TC007 - PASS (44ms)
+
+TEST SUITE 4: Numeric Range Validation
+---------------------------------------
+TC008 - PASS (36ms)
+TC009 - PASS (40ms)
+TC010 - PASS (41ms)
+TC032 - PASS (37ms)
+
+TEST SUITE 5: Referential Integrity Validation
+-----------------------------------------------
+TC011 - PASS (55ms)
+TC012 - PASS (58ms)
+TC013 - PASS (54ms)
+TC014 - PASS (59ms)
+
+TEST SUITE 6: Null Value Validation
+------------------------------------
+TC015 - PASS (35ms)
+TC016 - PASS (38ms)
+TC017 - PASS (39ms)
+TC018 - PASS (36ms)
+TC019 - PASS (40ms)
+TC020 - PASS (41ms)
+
+TEST SUITE 7: Business Rule Validation
+---------------------------------------
+TC021 - PASS (42ms)
+TC022 - PASS (45ms)
+TC023 - PASS (43ms)
+TC024 - PASS (46ms)
+TC033 - PASS (44ms)
+TC034 - PASS (43ms)
+
+TEST SUITE 8: Duplicate Detection
+----------------------------------
+TC025 - PASS (48ms)
+TC026 - PASS (52ms)
+TC027 - PASS (47ms)
+TC028 - PASS (53ms)
+
+TEST SUITE 9: Data Consistency Validation
+------------------------------------------
+TC029 - PASS (61ms)
+TC030 - PASS (64ms)
+
+TEST SUITE 10: Edge Cases and Negative Tests
+---------------------------------------------
+TC035 - PASS (125ms)
+
+================================================================================
+TEST EXECUTION SUMMARY
+================================================================================
+Test Execution ID: {TestExecutionId}
+Start Time: 2024-01-15 10:00:00
+End Time: 2024-01-15 10:00:59
+Total Duration: 1645 ms
+Total Tests: 35
+Passed Tests: 35
+Failed Tests: 0
+Skipped Tests: 0
+Success Rate: 100%
+================================================================================
+
+STATUS: ALL UNIT TESTS PASSED
+
+Test Harness Execution Completed.
+================================================================================
+  </system-out>
+  
+  <!-- System Error (empty if no errors) -->
+  <system-err></system-err>
+  
+</testsuites>
