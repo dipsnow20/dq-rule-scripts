@@ -1,700 +1,839 @@
 /*
-=============================================================================
-PRODUCTION-READY T-SQL DATA QUALITY VALIDATION SCRIPT
-=============================================================================
-Script Name: Output_DI_OptimiseTSQLScript.sql
-Purpose: Consolidated and optimized T-SQL data quality validation checks
-Author: Data Engineer - AAVA Agent
-Created: 2024
+==============================================================================
+COMPREHENSIVE DATA QUALITY VALIDATION SCRIPT
+For Compensation Survey Data
+==============================================================================
+Author: Data Engineering Team
 Version: 1.0
-
-Description:
-This script consolidates all data quality checks into a single, efficient,
-production-ready T-SQL script with comprehensive error handling, logging,
-and performance optimization.
-
-Quality Checks Included:
-1. Data Format Validation (dates, emails, phone numbers, numeric ranges)
-2. Referential Integrity Checks (orphaned records)
-3. Null Value Validation (required fields)
-4. Data Type Enforcement
-5. Business Rule Validation
-6. Duplicate Record Detection
-7. Performance and Consistency Checks
-=============================================================================
+Date: 2024
+Description: Production-ready T-SQL script for comprehensive data quality 
+             validation of compensation survey data across all categories.
+             
+Optimizations Applied:
+- Set-based operations instead of cursors
+- Consolidated related checks into single queries
+- Parameterized for reusability
+- Comprehensive error handling and transaction management
+- Centralized logging mechanism
+- Idempotent execution capability
+==============================================================================
 */
-
--- =============================================
--- SECTION 1: PRE-CHECK SETUP
--- =============================================
 
 SET NOCOUNT ON;
-SET ANSI_WARNINGS OFF;
-SET XACT_ABORT ON;
+SET ANSI_NULLS ON;
+SET QUOTED_IDENTIFIER ON;
 
--- Declare variables for configuration and logging
-DECLARE @ExecutionStartTime DATETIME2 = GETDATE();
-DECLARE @CheckName NVARCHAR(100);
-DECLARE @ErrorCount INT = 0;
-DECLARE @TotalChecks INT = 0;
-DECLARE @CheckStatus NVARCHAR(20);
-DECLARE @ErrorMessage NVARCHAR(MAX);
-DECLARE @SQL NVARCHAR(MAX);
-
--- Create temporary tables for logging and results
-IF OBJECT_ID('tempdb..#DQResults') IS NOT NULL DROP TABLE #DQResults;
-CREATE TABLE #DQResults (
-    CheckID INT IDENTITY(1,1) PRIMARY KEY,
-    CheckName NVARCHAR(100) NOT NULL,
-    CheckCategory NVARCHAR(50) NOT NULL,
-    ExecutionTime DATETIME2 NOT NULL,
-    Status NVARCHAR(20) NOT NULL,
-    ErrorCount INT NOT NULL,
-    ErrorMessage NVARCHAR(MAX) NULL,
-    AffectedRecords INT NULL
-);
-
-IF OBJECT_ID('tempdb..#DQErrors') IS NOT NULL DROP TABLE #DQErrors;
-CREATE TABLE #DQErrors (
-    ErrorID INT IDENTITY(1,1) PRIMARY KEY,
-    CheckName NVARCHAR(100) NOT NULL,
-    TableName NVARCHAR(128) NOT NULL,
-    ColumnName NVARCHAR(128) NULL,
-    ErrorType NVARCHAR(50) NOT NULL,
-    ErrorDescription NVARCHAR(MAX) NOT NULL,
-    RecordIdentifier NVARCHAR(MAX) NULL,
-    DetectedTime DATETIME2 NOT NULL DEFAULT GETDATE()
-);
-
-PRINT '=========================================';
-PRINT 'DATA QUALITY VALIDATION SCRIPT STARTED';
-PRINT 'Start Time: ' + CONVERT(VARCHAR, @ExecutionStartTime, 120);
-PRINT '=========================================';
-
--- =============================================
--- SECTION 2: QUALITY CHECKS
--- =============================================
-
--- =============================================
--- CHECK 1: DATE FORMAT VALIDATION
--- =============================================
-BEGIN TRY
-    SET @CheckName = 'Date Format Validation';
-    SET @TotalChecks = @TotalChecks + 1;
-    
-    PRINT 'Executing: ' + @CheckName;
-    
-    -- Check for invalid date formats in Orders table
-    INSERT INTO #DQErrors (CheckName, TableName, ColumnName, ErrorType, ErrorDescription, RecordIdentifier)
-    SELECT 
-        @CheckName,
-        'Orders',
-        'OrderDate',
-        'Invalid Date Format',
-        'OrderDate contains invalid date value: ' + ISNULL(CAST(OrderDate AS NVARCHAR), 'NULL'),
-        'OrderID: ' + ISNULL(CAST(OrderID AS NVARCHAR), 'NULL')
-    FROM Orders 
-    WHERE OrderDate IS NOT NULL 
-      AND ISDATE(CAST(OrderDate AS NVARCHAR)) = 0;
-    
-    SET @ErrorCount = @@ROWCOUNT;
-    SET @CheckStatus = CASE WHEN @ErrorCount = 0 THEN 'PASSED' ELSE 'FAILED' END;
-    
-    INSERT INTO #DQResults (CheckName, CheckCategory, ExecutionTime, Status, ErrorCount, AffectedRecords)
-    VALUES (@CheckName, 'Data Format Validation', GETDATE(), @CheckStatus, @ErrorCount, @ErrorCount);
-    
-END TRY
-BEGIN CATCH
-    SET @ErrorMessage = ERROR_MESSAGE();
-    INSERT INTO #DQResults (CheckName, CheckCategory, ExecutionTime, Status, ErrorCount, ErrorMessage)
-    VALUES (@CheckName, 'Data Format Validation', GETDATE(), 'ERROR', -1, @ErrorMessage);
-END CATCH;
-
--- =============================================
--- CHECK 2: EMAIL FORMAT VALIDATION
--- =============================================
-BEGIN TRY
-    SET @CheckName = 'Email Format Validation';
-    SET @TotalChecks = @TotalChecks + 1;
-    
-    PRINT 'Executing: ' + @CheckName;
-    
-    -- Check for invalid email formats
-    INSERT INTO #DQErrors (CheckName, TableName, ColumnName, ErrorType, ErrorDescription, RecordIdentifier)
-    SELECT 
-        @CheckName,
-        'Customers',
-        'Email',
-        'Invalid Email Format',
-        'Email does not match valid pattern: ' + ISNULL(Email, 'NULL'),
-        'CustomerID: ' + ISNULL(CAST(CustomerID AS NVARCHAR), 'NULL')
-    FROM Customers 
-    WHERE Email IS NOT NULL 
-      AND (Email NOT LIKE '%@%.%' 
-           OR Email LIKE '%@%@%' 
-           OR Email LIKE '.%@%' 
-           OR Email LIKE '%@.%' 
-           OR LEN(Email) < 5);
-    
-    SET @ErrorCount = @@ROWCOUNT;
-    SET @CheckStatus = CASE WHEN @ErrorCount = 0 THEN 'PASSED' ELSE 'FAILED' END;
-    
-    INSERT INTO #DQResults (CheckName, CheckCategory, ExecutionTime, Status, ErrorCount, AffectedRecords)
-    VALUES (@CheckName, 'Data Format Validation', GETDATE(), @CheckStatus, @ErrorCount, @ErrorCount);
-    
-END TRY
-BEGIN CATCH
-    SET @ErrorMessage = ERROR_MESSAGE();
-    INSERT INTO #DQResults (CheckName, CheckCategory, ExecutionTime, Status, ErrorCount, ErrorMessage)
-    VALUES (@CheckName, 'Data Format Validation', GETDATE(), 'ERROR', -1, @ErrorMessage);
-END CATCH;
-
--- =============================================
--- CHECK 3: PHONE NUMBER FORMAT VALIDATION
--- =============================================
-BEGIN TRY
-    SET @CheckName = 'Phone Number Format Validation';
-    SET @TotalChecks = @TotalChecks + 1;
-    
-    PRINT 'Executing: ' + @CheckName;
-    
-    -- Check for invalid phone number formats
-    INSERT INTO #DQErrors (CheckName, TableName, ColumnName, ErrorType, ErrorDescription, RecordIdentifier)
-    SELECT 
-        @CheckName,
-        'Customers',
-        'Phone',
-        'Invalid Phone Format',
-        'Phone number does not match expected pattern: ' + ISNULL(Phone, 'NULL'),
-        'CustomerID: ' + ISNULL(CAST(CustomerID AS NVARCHAR), 'NULL')
-    FROM Customers 
-    WHERE Phone IS NOT NULL 
-      AND Phone NOT LIKE '[0-9][0-9][0-9]-[0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]'
-      AND Phone NOT LIKE '([0-9][0-9][0-9]) [0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]'
-      AND Phone NOT LIKE '+[0-9]%';
-    
-    SET @ErrorCount = @@ROWCOUNT;
-    SET @CheckStatus = CASE WHEN @ErrorCount = 0 THEN 'PASSED' ELSE 'FAILED' END;
-    
-    INSERT INTO #DQResults (CheckName, CheckCategory, ExecutionTime, Status, ErrorCount, AffectedRecords)
-    VALUES (@CheckName, 'Data Format Validation', GETDATE(), @CheckStatus, @ErrorCount, @ErrorCount);
-    
-END TRY
-BEGIN CATCH
-    SET @ErrorMessage = ERROR_MESSAGE();
-    INSERT INTO #DQResults (CheckName, CheckCategory, ExecutionTime, Status, ErrorCount, ErrorMessage)
-    VALUES (@CheckName, 'Data Format Validation', GETDATE(), 'ERROR', -1, @ErrorMessage);
-END CATCH;
-
--- =============================================
--- CHECK 4: NUMERIC RANGE VALIDATION
--- =============================================
-BEGIN TRY
-    SET @CheckName = 'Numeric Range Validation';
-    SET @TotalChecks = @TotalChecks + 1;
-    
-    PRINT 'Executing: ' + @CheckName;
-    
-    -- Check for invalid price ranges in Products table
-    INSERT INTO #DQErrors (CheckName, TableName, ColumnName, ErrorType, ErrorDescription, RecordIdentifier)
-    SELECT 
-        @CheckName,
-        'Products',
-        'Price',
-        'Invalid Numeric Range',
-        'Price is outside valid range (0-10000): ' + ISNULL(CAST(Price AS NVARCHAR), 'NULL'),
-        'ProductID: ' + ISNULL(CAST(ProductID AS NVARCHAR), 'NULL')
-    FROM Products 
-    WHERE Price IS NOT NULL 
-      AND (Price < 0 OR Price > 10000);
-    
-    SET @ErrorCount = @@ROWCOUNT;
-    SET @CheckStatus = CASE WHEN @ErrorCount = 0 THEN 'PASSED' ELSE 'FAILED' END;
-    
-    INSERT INTO #DQResults (CheckName, CheckCategory, ExecutionTime, Status, ErrorCount, AffectedRecords)
-    VALUES (@CheckName, 'Data Format Validation', GETDATE(), @CheckStatus, @ErrorCount, @ErrorCount);
-    
-END TRY
-BEGIN CATCH
-    SET @ErrorMessage = ERROR_MESSAGE();
-    INSERT INTO #DQResults (CheckName, CheckCategory, ExecutionTime, Status, ErrorCount, ErrorMessage)
-    VALUES (@CheckName, 'Data Format Validation', GETDATE(), 'ERROR', -1, @ErrorMessage);
-END CATCH;
-
--- =============================================
--- CHECK 5: REFERENTIAL INTEGRITY - ORPHANED RECORDS
--- =============================================
-BEGIN TRY
-    SET @CheckName = 'Referential Integrity - Orders';
-    SET @TotalChecks = @TotalChecks + 1;
-    
-    PRINT 'Executing: ' + @CheckName;
-    
-    -- Check for orphaned records in OrderDetails (missing Orders)
-    INSERT INTO #DQErrors (CheckName, TableName, ColumnName, ErrorType, ErrorDescription, RecordIdentifier)
-    SELECT 
-        @CheckName,
-        'OrderDetails',
-        'OrderID',
-        'Orphaned Record',
-        'OrderDetails record references non-existent Order: ' + ISNULL(CAST(od.OrderID AS NVARCHAR), 'NULL'),
-        'OrderDetailID: ' + ISNULL(CAST(od.OrderDetailID AS NVARCHAR), 'NULL')
-    FROM OrderDetails od
-    LEFT JOIN Orders o ON od.OrderID = o.OrderID
-    WHERE o.OrderID IS NULL AND od.OrderID IS NOT NULL;
-    
-    SET @ErrorCount = @@ROWCOUNT;
-    SET @CheckStatus = CASE WHEN @ErrorCount = 0 THEN 'PASSED' ELSE 'FAILED' END;
-    
-    INSERT INTO #DQResults (CheckName, CheckCategory, ExecutionTime, Status, ErrorCount, AffectedRecords)
-    VALUES (@CheckName, 'Referential Integrity', GETDATE(), @CheckStatus, @ErrorCount, @ErrorCount);
-    
-END TRY
-BEGIN CATCH
-    SET @ErrorMessage = ERROR_MESSAGE();
-    INSERT INTO #DQResults (CheckName, CheckCategory, ExecutionTime, Status, ErrorCount, ErrorMessage)
-    VALUES (@CheckName, 'Referential Integrity', GETDATE(), 'ERROR', -1, @ErrorMessage);
-END CATCH;
+-- ============================================================================
+-- SECTION 1: PRE-CHECK SETUP AND CONFIGURATION
+-- ============================================================================
 
 BEGIN TRY
-    SET @CheckName = 'Referential Integrity - Products';
-    SET @TotalChecks = @TotalChecks + 1;
+    -- Start transaction for atomic execution
+    BEGIN TRANSACTION DQ_Validation;
     
-    PRINT 'Executing: ' + @CheckName;
+    -- Declare variables for configuration
+    DECLARE @ExecutionId UNIQUEIDENTIFIER = NEWID();
+    DECLARE @StartTime DATETIME2 = GETDATE();
+    DECLARE @TotalRecords INT;
+    DECLARE @ErrorCount INT = 0;
+    DECLARE @WarningCount INT = 0;
+    DECLARE @ValidationDate DATE = CAST(GETDATE() AS DATE);
     
-    -- Check for orphaned records in OrderDetails (missing Products)
-    INSERT INTO #DQErrors (CheckName, TableName, ColumnName, ErrorType, ErrorDescription, RecordIdentifier)
-    SELECT 
-        @CheckName,
-        'OrderDetails',
-        'ProductID',
-        'Orphaned Record',
-        'OrderDetails record references non-existent Product: ' + ISNULL(CAST(od.ProductID AS NVARCHAR), 'NULL'),
-        'OrderDetailID: ' + ISNULL(CAST(od.OrderDetailID AS NVARCHAR), 'NULL')
-    FROM OrderDetails od
-    LEFT JOIN Products p ON od.ProductID = p.ProductID
-    WHERE p.ProductID IS NULL AND od.ProductID IS NOT NULL;
+    -- Configuration parameters
+    DECLARE @MaxSalaryUSD DECIMAL(15,2) = 2000000;  -- Maximum reasonable salary in USD
+    DECLARE @MinSalaryUSD DECIMAL(15,2) = 15000;    -- Minimum reasonable salary in USD
+    DECLARE @MaxExperienceYears INT = 50;           -- Maximum reasonable experience
+    DECLARE @MaxVariablePayRatio DECIMAL(5,2) = 5.0; -- Maximum variable pay as ratio of base
+    DECLARE @MaxBenefitsRatio DECIMAL(5,2) = 1.0;   -- Maximum benefits as ratio of base
+    DECLARE @DataRetentionYears INT = 5;            -- Data retention period
     
-    SET @ErrorCount = @@ROWCOUNT;
-    SET @CheckStatus = CASE WHEN @ErrorCount = 0 THEN 'PASSED' ELSE 'FAILED' END;
+    -- Get total record count for percentage calculations
+    SELECT @TotalRecords = COUNT(*) FROM compensation_survey;
     
-    INSERT INTO #DQResults (CheckName, CheckCategory, ExecutionTime, Status, ErrorCount, AffectedRecords)
-    VALUES (@CheckName, 'Referential Integrity', GETDATE(), @CheckStatus, @ErrorCount, @ErrorCount);
-    
-END TRY
-BEGIN CATCH
-    SET @ErrorMessage = ERROR_MESSAGE();
-    INSERT INTO #DQResults (CheckName, CheckCategory, ExecutionTime, Status, ErrorCount, ErrorMessage)
-    VALUES (@CheckName, 'Referential Integrity', GETDATE(), 'ERROR', -1, @ErrorMessage);
-END CATCH;
-
--- =============================================
--- CHECK 6: NULL VALUE VALIDATION
--- =============================================
-BEGIN TRY
-    SET @CheckName = 'Null Value Validation - Customers';
-    SET @TotalChecks = @TotalChecks + 1;
-    
-    PRINT 'Executing: ' + @CheckName;
-    
-    -- Check for null values in required Customer fields
-    INSERT INTO #DQErrors (CheckName, TableName, ColumnName, ErrorType, ErrorDescription, RecordIdentifier)
-    SELECT 
-        @CheckName,
-        'Customers',
-        CASE 
-            WHEN CustomerID IS NULL THEN 'CustomerID'
-            WHEN FirstName IS NULL THEN 'FirstName'
-            WHEN LastName IS NULL THEN 'LastName'
-            WHEN Email IS NULL THEN 'Email'
-        END,
-        'Null Value',
-        'Required field contains null value',
-        'CustomerID: ' + ISNULL(CAST(CustomerID AS NVARCHAR), 'NULL')
-    FROM Customers 
-    WHERE CustomerID IS NULL 
-       OR FirstName IS NULL 
-       OR LastName IS NULL 
-       OR Email IS NULL;
-    
-    SET @ErrorCount = @@ROWCOUNT;
-    SET @CheckStatus = CASE WHEN @ErrorCount = 0 THEN 'PASSED' ELSE 'FAILED' END;
-    
-    INSERT INTO #DQResults (CheckName, CheckCategory, ExecutionTime, Status, ErrorCount, AffectedRecords)
-    VALUES (@CheckName, 'Null Value Validation', GETDATE(), @CheckStatus, @ErrorCount, @ErrorCount);
-    
-END TRY
-BEGIN CATCH
-    SET @ErrorMessage = ERROR_MESSAGE();
-    INSERT INTO #DQResults (CheckName, CheckCategory, ExecutionTime, Status, ErrorCount, ErrorMessage)
-    VALUES (@CheckName, 'Null Value Validation', GETDATE(), 'ERROR', -1, @ErrorMessage);
-END CATCH;
-
-BEGIN TRY
-    SET @CheckName = 'Null Value Validation - Products';
-    SET @TotalChecks = @TotalChecks + 1;
-    
-    PRINT 'Executing: ' + @CheckName;
-    
-    -- Check for null values in required Product fields
-    INSERT INTO #DQErrors (CheckName, TableName, ColumnName, ErrorType, ErrorDescription, RecordIdentifier)
-    SELECT 
-        @CheckName,
-        'Products',
-        CASE 
-            WHEN ProductID IS NULL THEN 'ProductID'
-            WHEN ProductName IS NULL THEN 'ProductName'
-            WHEN Price IS NULL THEN 'Price'
-        END,
-        'Null Value',
-        'Required field contains null value',
-        'ProductID: ' + ISNULL(CAST(ProductID AS NVARCHAR), 'NULL')
-    FROM Products 
-    WHERE ProductID IS NULL 
-       OR ProductName IS NULL 
-       OR Price IS NULL;
-    
-    SET @ErrorCount = @@ROWCOUNT;
-    SET @CheckStatus = CASE WHEN @ErrorCount = 0 THEN 'PASSED' ELSE 'FAILED' END;
-    
-    INSERT INTO #DQResults (CheckName, CheckCategory, ExecutionTime, Status, ErrorCount, AffectedRecords)
-    VALUES (@CheckName, 'Null Value Validation', GETDATE(), @CheckStatus, @ErrorCount, @ErrorCount);
-    
-END TRY
-BEGIN CATCH
-    SET @ErrorMessage = ERROR_MESSAGE();
-    INSERT INTO #DQResults (CheckName, CheckCategory, ExecutionTime, Status, ErrorCount, ErrorMessage)
-    VALUES (@CheckName, 'Null Value Validation', GETDATE(), 'ERROR', -1, @ErrorMessage);
-END CATCH;
-
--- =============================================
--- CHECK 7: BUSINESS RULE VALIDATION
--- =============================================
-BEGIN TRY
-    SET @CheckName = 'Business Rule - Discount Validation';
-    SET @TotalChecks = @TotalChecks + 1;
-    
-    PRINT 'Executing: ' + @CheckName;
-    
-    -- Check for invalid discount values (greater than 50%)
-    INSERT INTO #DQErrors (CheckName, TableName, ColumnName, ErrorType, ErrorDescription, RecordIdentifier)
-    SELECT 
-        @CheckName,
-        'Orders',
-        'Discount',
-        'Business Rule Violation',
-        'Discount exceeds maximum allowed (50%): ' + ISNULL(CAST(Discount AS NVARCHAR), 'NULL'),
-        'OrderID: ' + ISNULL(CAST(OrderID AS NVARCHAR), 'NULL')
-    FROM Orders 
-    WHERE Discount > 0.50;
-    
-    SET @ErrorCount = @@ROWCOUNT;
-    SET @CheckStatus = CASE WHEN @ErrorCount = 0 THEN 'PASSED' ELSE 'FAILED' END;
-    
-    INSERT INTO #DQResults (CheckName, CheckCategory, ExecutionTime, Status, ErrorCount, AffectedRecords)
-    VALUES (@CheckName, 'Business Rule Validation', GETDATE(), @CheckStatus, @ErrorCount, @ErrorCount);
-    
-END TRY
-BEGIN CATCH
-    SET @ErrorMessage = ERROR_MESSAGE();
-    INSERT INTO #DQResults (CheckName, CheckCategory, ExecutionTime, Status, ErrorCount, ErrorMessage)
-    VALUES (@CheckName, 'Business Rule Validation', GETDATE(), 'ERROR', -1, @ErrorMessage);
-END CATCH;
-
-BEGIN TRY
-    SET @CheckName = 'Business Rule - Future Date Validation';
-    SET @TotalChecks = @TotalChecks + 1;
-    
-    PRINT 'Executing: ' + @CheckName;
-    
-    -- Check for order dates in the future
-    INSERT INTO #DQErrors (CheckName, TableName, ColumnName, ErrorType, ErrorDescription, RecordIdentifier)
-    SELECT 
-        @CheckName,
-        'Orders',
-        'OrderDate',
-        'Business Rule Violation',
-        'Order date is in the future: ' + ISNULL(CONVERT(VARCHAR, OrderDate, 120), 'NULL'),
-        'OrderID: ' + ISNULL(CAST(OrderID AS NVARCHAR), 'NULL')
-    FROM Orders 
-    WHERE OrderDate > GETDATE();
-    
-    SET @ErrorCount = @@ROWCOUNT;
-    SET @CheckStatus = CASE WHEN @ErrorCount = 0 THEN 'PASSED' ELSE 'FAILED' END;
-    
-    INSERT INTO #DQResults (CheckName, CheckCategory, ExecutionTime, Status, ErrorCount, AffectedRecords)
-    VALUES (@CheckName, 'Business Rule Validation', GETDATE(), @CheckStatus, @ErrorCount, @ErrorCount);
-    
-END TRY
-BEGIN CATCH
-    SET @ErrorMessage = ERROR_MESSAGE();
-    INSERT INTO #DQResults (CheckName, CheckCategory, ExecutionTime, Status, ErrorCount, ErrorMessage)
-    VALUES (@CheckName, 'Business Rule Validation', GETDATE(), 'ERROR', -1, @ErrorMessage);
-END CATCH;
-
--- =============================================
--- CHECK 8: DUPLICATE RECORD DETECTION
--- =============================================
-BEGIN TRY
-    SET @CheckName = 'Duplicate Detection - Customers';
-    SET @TotalChecks = @TotalChecks + 1;
-    
-    PRINT 'Executing: ' + @CheckName;
-    
-    -- Check for duplicate customers based on CustomerID
-    INSERT INTO #DQErrors (CheckName, TableName, ColumnName, ErrorType, ErrorDescription, RecordIdentifier)
-    SELECT 
-        @CheckName,
-        'Customers',
-        'CustomerID',
-        'Duplicate Record',
-        'Duplicate CustomerID found: ' + ISNULL(CAST(CustomerID AS NVARCHAR), 'NULL') + ' (Count: ' + CAST(COUNT(*) AS NVARCHAR) + ')',
-        'CustomerID: ' + ISNULL(CAST(CustomerID AS NVARCHAR), 'NULL')
-    FROM Customers 
-    WHERE CustomerID IS NOT NULL
-    GROUP BY CustomerID 
-    HAVING COUNT(*) > 1;
-    
-    SET @ErrorCount = @@ROWCOUNT;
-    SET @CheckStatus = CASE WHEN @ErrorCount = 0 THEN 'PASSED' ELSE 'FAILED' END;
-    
-    INSERT INTO #DQResults (CheckName, CheckCategory, ExecutionTime, Status, ErrorCount, AffectedRecords)
-    VALUES (@CheckName, 'Duplicate Detection', GETDATE(), @CheckStatus, @ErrorCount, @ErrorCount);
-    
-END TRY
-BEGIN CATCH
-    SET @ErrorMessage = ERROR_MESSAGE();
-    INSERT INTO #DQResults (CheckName, CheckCategory, ExecutionTime, Status, ErrorCount, ErrorMessage)
-    VALUES (@CheckName, 'Duplicate Detection', GETDATE(), 'ERROR', -1, @ErrorMessage);
-END CATCH;
-
-BEGIN TRY
-    SET @CheckName = 'Duplicate Detection - Products';
-    SET @TotalChecks = @TotalChecks + 1;
-    
-    PRINT 'Executing: ' + @CheckName;
-    
-    -- Check for duplicate products based on ProductName
-    INSERT INTO #DQErrors (CheckName, TableName, ColumnName, ErrorType, ErrorDescription, RecordIdentifier)
-    SELECT 
-        @CheckName,
-        'Products',
-        'ProductName',
-        'Duplicate Record',
-        'Duplicate ProductName found: ' + ISNULL(ProductName, 'NULL') + ' (Count: ' + CAST(COUNT(*) AS NVARCHAR) + ')',
-        'ProductName: ' + ISNULL(ProductName, 'NULL')
-    FROM Products 
-    WHERE ProductName IS NOT NULL
-    GROUP BY ProductName 
-    HAVING COUNT(*) > 1;
-    
-    SET @ErrorCount = @@ROWCOUNT;
-    SET @CheckStatus = CASE WHEN @ErrorCount = 0 THEN 'PASSED' ELSE 'FAILED' END;
-    
-    INSERT INTO #DQResults (CheckName, CheckCategory, ExecutionTime, Status, ErrorCount, AffectedRecords)
-    VALUES (@CheckName, 'Duplicate Detection', GETDATE(), @CheckStatus, @ErrorCount, @ErrorCount);
-    
-END TRY
-BEGIN CATCH
-    SET @ErrorMessage = ERROR_MESSAGE();
-    INSERT INTO #DQResults (CheckName, CheckCategory, ExecutionTime, Status, ErrorCount, ErrorMessage)
-    VALUES (@CheckName, 'Duplicate Detection', GETDATE(), 'ERROR', -1, @ErrorMessage);
-END CATCH;
-
--- =============================================
--- CHECK 9: DATA CONSISTENCY VALIDATION
--- =============================================
-BEGIN TRY
-    SET @CheckName = 'Data Consistency - Order Totals';
-    SET @TotalChecks = @TotalChecks + 1;
-    
-    PRINT 'Executing: ' + @CheckName;
-    
-    -- Check for inconsistent order totals (if OrderTotal column exists)
-    -- This is a placeholder check - adjust based on actual schema
-    INSERT INTO #DQErrors (CheckName, TableName, ColumnName, ErrorType, ErrorDescription, RecordIdentifier)
-    SELECT 
-        @CheckName,
-        'Orders',
-        'OrderTotal',
-        'Data Consistency',
-        'Order total does not match sum of order details',
-        'OrderID: ' + ISNULL(CAST(o.OrderID AS NVARCHAR), 'NULL')
-    FROM Orders o
-    INNER JOIN (
-        SELECT 
-            OrderID,
-            SUM(Quantity * UnitPrice) AS CalculatedTotal
-        FROM OrderDetails
-        GROUP BY OrderID
-    ) calc ON o.OrderID = calc.OrderID
-    WHERE ABS(ISNULL(o.OrderTotal, 0) - calc.CalculatedTotal) > 0.01; -- Allow for small rounding differences
-    
-    SET @ErrorCount = @@ROWCOUNT;
-    SET @CheckStatus = CASE WHEN @ErrorCount = 0 THEN 'PASSED' ELSE 'FAILED' END;
-    
-    INSERT INTO #DQResults (CheckName, CheckCategory, ExecutionTime, Status, ErrorCount, AffectedRecords)
-    VALUES (@CheckName, 'Data Consistency', GETDATE(), @CheckStatus, @ErrorCount, @ErrorCount);
-    
-END TRY
-BEGIN CATCH
-    SET @ErrorMessage = ERROR_MESSAGE();
-    INSERT INTO #DQResults (CheckName, CheckCategory, ExecutionTime, Status, ErrorCount, ErrorMessage)
-    VALUES (@CheckName, 'Data Consistency', GETDATE(), 'ERROR', -1, @ErrorMessage);
-END CATCH;
-
--- =============================================
--- SECTION 3: ERROR HANDLING & LOGGING
--- =============================================
-
--- Log execution completion
-DECLARE @ExecutionEndTime DATETIME2 = GETDATE();
-DECLARE @ExecutionDuration INT = DATEDIFF(SECOND, @ExecutionStartTime, @ExecutionEndTime);
-DECLARE @TotalErrors INT = (SELECT COUNT(*) FROM #DQErrors);
-DECLARE @FailedChecks INT = (SELECT COUNT(*) FROM #DQResults WHERE Status = 'FAILED');
-DECLARE @PassedChecks INT = (SELECT COUNT(*) FROM #DQResults WHERE Status = 'PASSED');
-DECLARE @ErrorChecks INT = (SELECT COUNT(*) FROM #DQResults WHERE Status = 'ERROR');
-
-PRINT '';
-PRINT '=========================================';
-PRINT 'DATA QUALITY VALIDATION COMPLETED';
-PRINT 'End Time: ' + CONVERT(VARCHAR, @ExecutionEndTime, 120);
-PRINT 'Duration: ' + CAST(@ExecutionDuration AS VARCHAR) + ' seconds';
-PRINT 'Total Checks: ' + CAST(@TotalChecks AS VARCHAR);
-PRINT 'Passed: ' + CAST(@PassedChecks AS VARCHAR);
-PRINT 'Failed: ' + CAST(@FailedChecks AS VARCHAR);
-PRINT 'Errors: ' + CAST(@ErrorChecks AS VARCHAR);
-PRINT 'Total Data Quality Issues: ' + CAST(@TotalErrors AS VARCHAR);
-PRINT '=========================================';
-
--- =============================================
--- SECTION 4: SUMMARY REPORTING
--- =============================================
-
--- Display summary of all checks
-PRINT '';
-PRINT 'DETAILED CHECK RESULTS:';
-PRINT '=======================';
-
-SELECT 
-    CheckID,
-    CheckName,
-    CheckCategory,
-    Status,
-    ErrorCount,
-    ISNULL(AffectedRecords, 0) AS AffectedRecords,
-    ExecutionTime,
-    ErrorMessage
-FROM #DQResults
-ORDER BY CheckID;
-
--- Display detailed error information if any errors found
-IF @TotalErrors > 0
-BEGIN
-    PRINT '';
-    PRINT 'DETAILED ERROR INFORMATION:';
-    PRINT '==========================';
-    
-    SELECT 
-        ErrorID,
-        CheckName,
-        TableName,
-        ColumnName,
-        ErrorType,
-        ErrorDescription,
-        RecordIdentifier,
-        DetectedTime
-    FROM #DQErrors
-    ORDER BY CheckName, ErrorID;
-END
-ELSE
-BEGIN
-    PRINT '';
-    PRINT 'NO DATA QUALITY ISSUES DETECTED!';
-END;
-
--- Create permanent log table if it doesn't exist (optional)
--- Uncomment the following section if you want to persist results
-/*
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[DataQualityLog]') AND type in (N'U'))
-BEGIN
-    CREATE TABLE [dbo].[DataQualityLog] (
-        LogID INT IDENTITY(1,1) PRIMARY KEY,
-        ExecutionDate DATETIME2 NOT NULL,
-        CheckName NVARCHAR(100) NOT NULL,
-        CheckCategory NVARCHAR(50) NOT NULL,
-        Status NVARCHAR(20) NOT NULL,
-        ErrorCount INT NOT NULL,
-        AffectedRecords INT NULL,
-        ErrorMessage NVARCHAR(MAX) NULL,
-        ExecutionDuration INT NULL
+    -- Create temporary table for consolidated results
+    IF OBJECT_ID('tempdb..#DQ_ValidationResults') IS NOT NULL
+        DROP TABLE #DQ_ValidationResults;
+        
+    CREATE TABLE #DQ_ValidationResults (
+        ExecutionId UNIQUEIDENTIFIER,
+        RuleId VARCHAR(50),
+        RuleName VARCHAR(200),
+        Category VARCHAR(100),
+        Severity VARCHAR(20),
+        ViolationCount INT,
+        TotalRecords INT,
+        ViolationPercentage DECIMAL(5,2),
+        Description NVARCHAR(500),
+        SampleViolations NVARCHAR(MAX),
+        CheckTimestamp DATETIME2,
+        Status VARCHAR(20)
     );
-END;
+    
+    -- Create temporary table for error logging
+    IF OBJECT_ID('tempdb..#DQ_ErrorLog') IS NOT NULL
+        DROP TABLE #DQ_ErrorLog;
+        
+    CREATE TABLE #DQ_ErrorLog (
+        ExecutionId UNIQUEIDENTIFIER,
+        ErrorTimestamp DATETIME2,
+        ErrorMessage NVARCHAR(MAX),
+        ErrorSeverity INT,
+        ErrorState INT,
+        ErrorProcedure NVARCHAR(128)
+    );
+    
+    PRINT 'Data Quality Validation Started - Execution ID: ' + CAST(@ExecutionId AS VARCHAR(36));
+    PRINT 'Total Records to Validate: ' + CAST(@TotalRecords AS VARCHAR(20));
+    PRINT '============================================================================';
 
--- Insert results into permanent log
-INSERT INTO [dbo].[DataQualityLog] (
-    ExecutionDate, CheckName, CheckCategory, Status, 
-    ErrorCount, AffectedRecords, ErrorMessage, ExecutionDuration
-)
+-- ============================================================================
+-- SECTION 2: GEOGRAPHIC DATA QUALITY CHECKS
+-- ============================================================================
+
+    PRINT 'Executing Geographic Data Quality Checks...';
+    
+    -- Rule GEO-001: Country Code ISO Validation
+    INSERT INTO #DQ_ValidationResults
+    SELECT 
+        @ExecutionId,
+        'GEO-001',
+        'Country Code ISO Validation',
+        'Geographic Data',
+        'HIGH',
+        COUNT(*),
+        @TotalRecords,
+        CAST(COUNT(*) * 100.0 / @TotalRecords AS DECIMAL(5,2)),
+        'Country codes must conform to ISO 3166-1 alpha-2 standards',
+        STRING_AGG(CAST(survey_id AS VARCHAR(20)), ', ') WITHIN GROUP (ORDER BY survey_id),
+        GETDATE(),
+        CASE WHEN COUNT(*) = 0 THEN 'PASS' ELSE 'FAIL' END
+    FROM compensation_survey 
+    WHERE country_code IS NULL 
+       OR LEN(country_code) != 2
+       OR country_code NOT LIKE '[A-Z][A-Z]'
+       OR country_code IN ('XX', 'ZZ', '00', '11');
+    
+    -- Rule GEO-002: Country Name Consistency
+    WITH CountryInconsistencies AS (
+        SELECT country_code, COUNT(DISTINCT country_name) as name_variations
+        FROM compensation_survey
+        WHERE country_code IS NOT NULL AND country_name IS NOT NULL
+        GROUP BY country_code
+        HAVING COUNT(DISTINCT country_name) > 1
+    )
+    INSERT INTO #DQ_ValidationResults
+    SELECT 
+        @ExecutionId,
+        'GEO-002',
+        'Country Name Consistency',
+        'Geographic Data',
+        'MEDIUM',
+        (SELECT COUNT(*) FROM CountryInconsistencies),
+        @TotalRecords,
+        CAST((SELECT COUNT(*) FROM CountryInconsistencies) * 100.0 / @TotalRecords AS DECIMAL(5,2)),
+        'Country names should be consistent for each country code',
+        (SELECT STRING_AGG(country_code, ', ') FROM CountryInconsistencies),
+        GETDATE(),
+        CASE WHEN (SELECT COUNT(*) FROM CountryInconsistencies) = 0 THEN 'PASS' ELSE 'FAIL' END;
+    
+    -- Rule GEO-003: Region-Country Consistency
+    INSERT INTO #DQ_ValidationResults
+    SELECT 
+        @ExecutionId,
+        'GEO-003',
+        'Region Country Consistency',
+        'Geographic Data',
+        'MEDIUM',
+        COUNT(*),
+        @TotalRecords,
+        CAST(COUNT(*) * 100.0 / @TotalRecords AS DECIMAL(5,2)),
+        'Regions should be valid for their respective countries',
+        STRING_AGG(CAST(survey_id AS VARCHAR(20)), ', ') WITHIN GROUP (ORDER BY survey_id),
+        GETDATE(),
+        CASE WHEN COUNT(*) = 0 THEN 'PASS' ELSE 'FAIL' END
+    FROM compensation_survey
+    WHERE region IS NOT NULL 
+      AND country_code IS NOT NULL
+      AND NOT EXISTS (
+          SELECT 1 FROM (
+              VALUES 
+                  ('US', 'California'), ('US', 'New York'), ('US', 'Texas'), ('US', 'Florida'),
+                  ('GB', 'England'), ('GB', 'Scotland'), ('GB', 'Wales'),
+                  ('CA', 'Ontario'), ('CA', 'Quebec'), ('CA', 'British Columbia'),
+                  ('DE', 'Bavaria'), ('DE', 'North Rhine-Westphalia'),
+                  ('FR', 'Île-de-France'), ('FR', 'Provence-Alpes-Côte d\'Azur')
+          ) AS ValidRegions(CountryCode, RegionName)
+          WHERE ValidRegions.CountryCode = compensation_survey.country_code
+            AND ValidRegions.RegionName = compensation_survey.region
+      );
+    
+    -- Rule GEO-004: City Data Quality
+    INSERT INTO #DQ_ValidationResults
+    SELECT 
+        @ExecutionId,
+        'GEO-004',
+        'City Data Quality',
+        'Geographic Data',
+        'LOW',
+        COUNT(*),
+        @TotalRecords,
+        CAST(COUNT(*) * 100.0 / @TotalRecords AS DECIMAL(5,2)),
+        'City names should be properly formatted and complete',
+        STRING_AGG(CAST(survey_id AS VARCHAR(20)), ', ') WITHIN GROUP (ORDER BY survey_id),
+        GETDATE(),
+        CASE WHEN COUNT(*) = 0 THEN 'PASS' ELSE 'FAIL' END
+    FROM compensation_survey
+    WHERE city IS NOT NULL 
+      AND (LEN(TRIM(city)) < 2 
+           OR city LIKE '%[0-9][0-9][0-9]%'
+           OR city LIKE '%[^a-zA-Z0-9 .-]%');
+
+-- ============================================================================
+-- SECTION 3: INDUSTRY DATA QUALITY CHECKS
+-- ============================================================================
+
+    PRINT 'Executing Industry Data Quality Checks...';
+    
+    -- Rule IND-001: Industry Code Validation
+    INSERT INTO #DQ_ValidationResults
+    SELECT 
+        @ExecutionId,
+        'IND-001',
+        'Industry Code Validation',
+        'Industry Data',
+        'HIGH',
+        COUNT(*),
+        @TotalRecords,
+        CAST(COUNT(*) * 100.0 / @TotalRecords AS DECIMAL(5,2)),
+        'Industry codes must be valid NAICS/SIC codes',
+        STRING_AGG(CAST(survey_id AS VARCHAR(20)), ', ') WITHIN GROUP (ORDER BY survey_id),
+        GETDATE(),
+        CASE WHEN COUNT(*) = 0 THEN 'PASS' ELSE 'FAIL' END
+    FROM compensation_survey
+    WHERE industry_code IS NOT NULL 
+      AND (LEN(industry_code) NOT BETWEEN 2 AND 6
+           OR industry_code NOT LIKE '[0-9]%'
+           OR industry_code LIKE '%[^0-9]%');
+    
+    -- Rule IND-002: Industry Hierarchy Consistency
+    INSERT INTO #DQ_ValidationResults
+    SELECT 
+        @ExecutionId,
+        'IND-002',
+        'Industry Hierarchy Consistency',
+        'Industry Data',
+        'MEDIUM',
+        COUNT(*),
+        @TotalRecords,
+        CAST(COUNT(*) * 100.0 / @TotalRecords AS DECIMAL(5,2)),
+        'Sub-industry should not exist without parent industry',
+        STRING_AGG(CAST(survey_id AS VARCHAR(20)), ', ') WITHIN GROUP (ORDER BY survey_id),
+        GETDATE(),
+        CASE WHEN COUNT(*) = 0 THEN 'PASS' ELSE 'FAIL' END
+    FROM compensation_survey
+    WHERE sub_industry IS NOT NULL AND industry IS NULL;
+    
+    -- Rule IND-003: Sector Classification Validation
+    INSERT INTO #DQ_ValidationResults
+    SELECT 
+        @ExecutionId,
+        'IND-003',
+        'Sector Classification Validation',
+        'Industry Data',
+        'MEDIUM',
+        COUNT(*),
+        @TotalRecords,
+        CAST(COUNT(*) * 100.0 / @TotalRecords AS DECIMAL(5,2)),
+        'Sector must be Public, Private, or Non-Profit',
+        STRING_AGG(CAST(survey_id AS VARCHAR(20)), ', ') WITHIN GROUP (ORDER BY survey_id),
+        GETDATE(),
+        CASE WHEN COUNT(*) = 0 THEN 'PASS' ELSE 'FAIL' END
+    FROM compensation_survey
+    WHERE sector IS NOT NULL 
+      AND sector NOT IN ('Public', 'Private', 'Non-Profit', 'Government', 'NGO');
+
+-- ============================================================================
+-- SECTION 4: ORGANIZATION DATA QUALITY CHECKS
+-- ============================================================================
+
+    PRINT 'Executing Organization Data Quality Checks...';
+    
+    -- Rule ORG-001: Company ID Uniqueness
+    WITH DuplicateCompanyIds AS (
+        SELECT company_id, COUNT(*) as duplicate_count
+        FROM compensation_survey
+        WHERE company_id IS NOT NULL
+        GROUP BY company_id
+        HAVING COUNT(*) > 1
+    )
+    INSERT INTO #DQ_ValidationResults
+    SELECT 
+        @ExecutionId,
+        'ORG-001',
+        'Company ID Uniqueness',
+        'Organization Data',
+        'HIGH',
+        (SELECT SUM(duplicate_count) FROM DuplicateCompanyIds),
+        @TotalRecords,
+        CAST((SELECT SUM(duplicate_count) FROM DuplicateCompanyIds) * 100.0 / @TotalRecords AS DECIMAL(5,2)),
+        'Each company should have a unique identifier',
+        (SELECT STRING_AGG(CAST(company_id AS VARCHAR(20)), ', ') FROM DuplicateCompanyIds),
+        GETDATE(),
+        CASE WHEN (SELECT COUNT(*) FROM DuplicateCompanyIds) = 0 THEN 'PASS' ELSE 'FAIL' END;
+    
+    -- Rule ORG-002: Company Size Validation
+    INSERT INTO #DQ_ValidationResults
+    SELECT 
+        @ExecutionId,
+        'ORG-002',
+        'Company Size Validation',
+        'Organization Data',
+        'MEDIUM',
+        COUNT(*),
+        @TotalRecords,
+        CAST(COUNT(*) * 100.0 / @TotalRecords AS DECIMAL(5,2)),
+        'Company size must be valid category and consistent with employee count',
+        STRING_AGG(CAST(survey_id AS VARCHAR(20)), ', ') WITHIN GROUP (ORDER BY survey_id),
+        GETDATE(),
+        CASE WHEN COUNT(*) = 0 THEN 'PASS' ELSE 'FAIL' END
+    FROM compensation_survey
+    WHERE (company_size IS NOT NULL AND company_size NOT IN ('Small', 'Medium', 'Large', 'Enterprise'))
+       OR (employee_count IS NOT NULL AND employee_count <= 0)
+       OR (employee_count IS NOT NULL AND employee_count > 10000000)
+       OR (company_size = 'Small' AND employee_count > 500)
+       OR (company_size = 'Enterprise' AND employee_count < 10000);
+    
+    -- Rule ORG-003: Employee Count Range Validation
+    INSERT INTO #DQ_ValidationResults
+    SELECT 
+        @ExecutionId,
+        'ORG-003',
+        'Employee Count Range Validation',
+        'Organization Data',
+        'MEDIUM',
+        COUNT(*),
+        @TotalRecords,
+        CAST(COUNT(*) * 100.0 / @TotalRecords AS DECIMAL(5,2)),
+        'Employee count should be within reasonable ranges',
+        STRING_AGG(CAST(survey_id AS VARCHAR(20)), ', ') WITHIN GROUP (ORDER BY survey_id),
+        GETDATE(),
+        CASE WHEN COUNT(*) = 0 THEN 'PASS' ELSE 'FAIL' END
+    FROM compensation_survey
+    WHERE employee_count IS NOT NULL 
+      AND (employee_count < 1 OR employee_count > 10000000);
+
+-- ============================================================================
+-- SECTION 5: JOB DATA QUALITY CHECKS
+-- ============================================================================
+
+    PRINT 'Executing Job Data Quality Checks...';
+    
+    -- Rule JOB-001: Job Title Completeness and Format
+    INSERT INTO #DQ_ValidationResults
+    SELECT 
+        @ExecutionId,
+        'JOB-001',
+        'Job Title Completeness and Format',
+        'Job Data',
+        'HIGH',
+        COUNT(*),
+        @TotalRecords,
+        CAST(COUNT(*) * 100.0 / @TotalRecords AS DECIMAL(5,2)),
+        'Job titles must be present and properly formatted',
+        STRING_AGG(CAST(survey_id AS VARCHAR(20)), ', ') WITHIN GROUP (ORDER BY survey_id),
+        GETDATE(),
+        CASE WHEN COUNT(*) = 0 THEN 'PASS' ELSE 'FAIL' END
+    FROM compensation_survey
+    WHERE job_title IS NULL 
+       OR LEN(TRIM(job_title)) < 3
+       OR job_title LIKE '%[0-9][0-9][0-9][0-9]%';
+    
+    -- Rule JOB-002: Job Level Consistency
+    INSERT INTO #DQ_ValidationResults
+    SELECT 
+        @ExecutionId,
+        'JOB-002',
+        'Job Level Consistency',
+        'Job Data',
+        'MEDIUM',
+        COUNT(*),
+        @TotalRecords,
+        CAST(COUNT(*) * 100.0 / @TotalRecords AS DECIMAL(5,2)),
+        'Job levels must be valid and consistent with experience',
+        STRING_AGG(CAST(survey_id AS VARCHAR(20)), ', ') WITHIN GROUP (ORDER BY survey_id),
+        GETDATE(),
+        CASE WHEN COUNT(*) = 0 THEN 'PASS' ELSE 'FAIL' END
+    FROM compensation_survey
+    WHERE job_level IS NOT NULL 
+      AND (job_level NOT IN ('Entry', 'Mid', 'Senior', 'Executive', 'C-Level')
+           OR (job_level = 'Entry' AND years_experience > 3)
+           OR (job_level = 'C-Level' AND years_experience < 10)
+           OR (job_level = 'Executive' AND years_experience < 8));
+    
+    -- Rule JOB-003: Experience Range Validation
+    INSERT INTO #DQ_ValidationResults
+    SELECT 
+        @ExecutionId,
+        'JOB-003',
+        'Experience Range Validation',
+        'Job Data',
+        'MEDIUM',
+        COUNT(*),
+        @TotalRecords,
+        CAST(COUNT(*) * 100.0 / @TotalRecords AS DECIMAL(5,2)),
+        'Years of experience should be within reasonable ranges',
+        STRING_AGG(CAST(survey_id AS VARCHAR(20)), ', ') WITHIN GROUP (ORDER BY survey_id),
+        GETDATE(),
+        CASE WHEN COUNT(*) = 0 THEN 'PASS' ELSE 'FAIL' END
+    FROM compensation_survey
+    WHERE years_experience IS NOT NULL 
+      AND (years_experience < 0 OR years_experience > @MaxExperienceYears);
+
+-- ============================================================================
+-- SECTION 6: COMPENSATION DATA QUALITY CHECKS
+-- ============================================================================
+
+    PRINT 'Executing Compensation Data Quality Checks...';
+    
+    -- Rule COMP-001: Base Salary Range and Currency Validation
+    INSERT INTO #DQ_ValidationResults
+    SELECT 
+        @ExecutionId,
+        'COMP-001',
+        'Base Salary Range and Currency Validation',
+        'Compensation Data',
+        'HIGH',
+        COUNT(*),
+        @TotalRecords,
+        CAST(COUNT(*) * 100.0 / @TotalRecords AS DECIMAL(5,2)),
+        'Base salary must be within reasonable ranges and have valid currency',
+        STRING_AGG(CAST(survey_id AS VARCHAR(20)), ', ') WITHIN GROUP (ORDER BY survey_id),
+        GETDATE(),
+        CASE WHEN COUNT(*) = 0 THEN 'PASS' ELSE 'FAIL' END
+    FROM compensation_survey
+    WHERE base_salary IS NOT NULL 
+      AND (base_salary <= 0 
+           OR base_salary > @MaxSalaryUSD
+           OR (currency = 'USD' AND base_salary < @MinSalaryUSD)
+           OR currency IS NULL
+           OR LEN(currency) != 3
+           OR currency NOT IN ('USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'CHF', 'SEK', 'NOK', 'DKK'));
+    
+    -- Rule COMP-002: Salary Outlier Detection by Job Level and Country
+    WITH SalaryPercentiles AS (
+        SELECT 
+            job_level, 
+            country_code,
+            PERCENTILE_CONT(0.05) WITHIN GROUP (ORDER BY base_salary) as P5,
+            PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY base_salary) as P95,
+            COUNT(*) as sample_size
+        FROM compensation_survey
+        WHERE base_salary IS NOT NULL 
+          AND job_level IS NOT NULL 
+          AND country_code IS NOT NULL
+        GROUP BY job_level, country_code
+        HAVING COUNT(*) >= 10  -- Only calculate percentiles for groups with sufficient data
+    ),
+    SalaryOutliers AS (
+        SELECT cs.survey_id, cs.job_level, cs.country_code, cs.base_salary
+        FROM compensation_survey cs
+        INNER JOIN SalaryPercentiles sp ON cs.job_level = sp.job_level 
+                                        AND cs.country_code = sp.country_code
+        WHERE cs.base_salary < sp.P5 OR cs.base_salary > sp.P95
+    )
+    INSERT INTO #DQ_ValidationResults
+    SELECT 
+        @ExecutionId,
+        'COMP-002',
+        'Salary Outlier Detection',
+        'Compensation Data',
+        'MEDIUM',
+        COUNT(*),
+        @TotalRecords,
+        CAST(COUNT(*) * 100.0 / @TotalRecords AS DECIMAL(5,2)),
+        'Salaries outside 5th-95th percentile range for job level and country',
+        STRING_AGG(CAST(survey_id AS VARCHAR(20)), ', ') WITHIN GROUP (ORDER BY survey_id),
+        GETDATE(),
+        CASE WHEN COUNT(*) = 0 THEN 'PASS' ELSE 'WARNING' END
+    FROM SalaryOutliers;
+    
+    -- Rule COMP-003: Variable Pay Ratio Validation
+    INSERT INTO #DQ_ValidationResults
+    SELECT 
+        @ExecutionId,
+        'COMP-003',
+        'Variable Pay Ratio Validation',
+        'Compensation Data',
+        'MEDIUM',
+        COUNT(*),
+        @TotalRecords,
+        CAST(COUNT(*) * 100.0 / @TotalRecords AS DECIMAL(5,2)),
+        'Variable pay should not exceed reasonable ratio of base salary',
+        STRING_AGG(CAST(survey_id AS VARCHAR(20)), ', ') WITHIN GROUP (ORDER BY survey_id),
+        GETDATE(),
+        CASE WHEN COUNT(*) = 0 THEN 'PASS' ELSE 'FAIL' END
+    FROM compensation_survey
+    WHERE variable_pay IS NOT NULL 
+      AND base_salary IS NOT NULL 
+      AND base_salary > 0
+      AND (variable_pay < 0 OR (variable_pay / base_salary) > @MaxVariablePayRatio);
+    
+    -- Rule COMP-004: Benefits Value Validation
+    INSERT INTO #DQ_ValidationResults
+    SELECT 
+        @ExecutionId,
+        'COMP-004',
+        'Benefits Value Validation',
+        'Compensation Data',
+        'MEDIUM',
+        COUNT(*),
+        @TotalRecords,
+        CAST(COUNT(*) * 100.0 / @TotalRecords AS DECIMAL(5,2)),
+        'Benefits value should be reasonable percentage of base salary',
+        STRING_AGG(CAST(survey_id AS VARCHAR(20)), ', ') WITHIN GROUP (ORDER BY survey_id),
+        GETDATE(),
+        CASE WHEN COUNT(*) = 0 THEN 'PASS' ELSE 'FAIL' END
+    FROM compensation_survey
+    WHERE benefits_value IS NOT NULL 
+      AND (benefits_value < 0
+           OR (base_salary IS NOT NULL AND base_salary > 0 AND (benefits_value / base_salary) > @MaxBenefitsRatio));
+    
+    -- Rule COMP-005: Total Compensation Consistency
+    INSERT INTO #DQ_ValidationResults
+    SELECT 
+        @ExecutionId,
+        'COMP-005',
+        'Total Compensation Consistency',
+        'Compensation Data',
+        'HIGH',
+        COUNT(*),
+        @TotalRecords,
+        CAST(COUNT(*) * 100.0 / @TotalRecords AS DECIMAL(5,2)),
+        'Total compensation should equal sum of components',
+        STRING_AGG(CAST(survey_id AS VARCHAR(20)), ', ') WITHIN GROUP (ORDER BY survey_id),
+        GETDATE(),
+        CASE WHEN COUNT(*) = 0 THEN 'PASS' ELSE 'FAIL' END
+    FROM compensation_survey
+    WHERE total_compensation IS NOT NULL 
+      AND ABS(total_compensation - (ISNULL(base_salary, 0) + 
+                                   ISNULL(variable_pay, 0) + 
+                                   ISNULL(benefits_value, 0) + 
+                                   ISNULL(equity_value, 0))) > 1000;
+
+-- ============================================================================
+-- SECTION 7: SURVEY METADATA QUALITY CHECKS
+-- ============================================================================
+
+    PRINT 'Executing Survey Metadata Quality Checks...';
+    
+    -- Rule META-001: Survey Date Validation
+    INSERT INTO #DQ_ValidationResults
+    SELECT 
+        @ExecutionId,
+        'META-001',
+        'Survey Date Validation',
+        'Survey Metadata',
+        'HIGH',
+        COUNT(*),
+        @TotalRecords,
+        CAST(COUNT(*) * 100.0 / @TotalRecords AS DECIMAL(5,2)),
+        'Survey dates must be valid and within retention period',
+        STRING_AGG(CAST(survey_id AS VARCHAR(20)), ', ') WITHIN GROUP (ORDER BY survey_id),
+        GETDATE(),
+        CASE WHEN COUNT(*) = 0 THEN 'PASS' ELSE 'FAIL' END
+    FROM compensation_survey
+    WHERE survey_date IS NULL
+       OR survey_date > GETDATE()
+       OR survey_date < DATEADD(YEAR, -@DataRetentionYears, GETDATE());
+    
+    -- Rule META-002: Response Completeness Assessment
+    WITH CompletenessMetrics AS (
+        SELECT 
+            survey_id,
+            CASE WHEN base_salary IS NULL THEN 1 ELSE 0 END +
+            CASE WHEN job_title IS NULL THEN 1 ELSE 0 END +
+            CASE WHEN country_code IS NULL THEN 1 ELSE 0 END +
+            CASE WHEN industry IS NULL THEN 1 ELSE 0 END +
+            CASE WHEN company_name IS NULL THEN 1 ELSE 0 END as missing_critical_fields
+        FROM compensation_survey
+    )
+    INSERT INTO #DQ_ValidationResults
+    SELECT 
+        @ExecutionId,
+        'META-002',
+        'Response Completeness Assessment',
+        'Survey Metadata',
+        'MEDIUM',
+        COUNT(*),
+        @TotalRecords,
+        CAST(COUNT(*) * 100.0 / @TotalRecords AS DECIMAL(5,2)),
+        'Responses should have all critical fields populated',
+        STRING_AGG(CAST(survey_id AS VARCHAR(20)), ', ') WITHIN GROUP (ORDER BY survey_id),
+        GETDATE(),
+        CASE WHEN COUNT(*) = 0 THEN 'PASS' ELSE 'WARNING' END
+    FROM CompletenessMetrics
+    WHERE missing_critical_fields >= 2;
+    
+    -- Rule META-003: Survey ID Uniqueness
+    WITH DuplicateSurveyIds AS (
+        SELECT survey_id, COUNT(*) as duplicate_count
+        FROM compensation_survey
+        WHERE survey_id IS NOT NULL
+        GROUP BY survey_id
+        HAVING COUNT(*) > 1
+    )
+    INSERT INTO #DQ_ValidationResults
+    SELECT 
+        @ExecutionId,
+        'META-003',
+        'Survey ID Uniqueness',
+        'Survey Metadata',
+        'HIGH',
+        (SELECT SUM(duplicate_count) FROM DuplicateSurveyIds),
+        @TotalRecords,
+        CAST((SELECT SUM(duplicate_count) FROM DuplicateSurveyIds) * 100.0 / @TotalRecords AS DECIMAL(5,2)),
+        'Each survey response should have a unique identifier',
+        (SELECT STRING_AGG(CAST(survey_id AS VARCHAR(20)), ', ') FROM DuplicateSurveyIds),
+        GETDATE(),
+        CASE WHEN (SELECT COUNT(*) FROM DuplicateSurveyIds) = 0 THEN 'PASS' ELSE 'FAIL' END;
+
+-- ============================================================================
+-- SECTION 8: CROSS-CATEGORY VALIDATION CHECKS
+-- ============================================================================
+
+    PRINT 'Executing Cross-Category Validation Checks...';
+    
+    -- Rule CROSS-001: Geographic-Currency Consistency
+    INSERT INTO #DQ_ValidationResults
+    SELECT 
+        @ExecutionId,
+        'CROSS-001',
+        'Geographic Currency Consistency',
+        'Cross-Category',
+        'MEDIUM',
+        COUNT(*),
+        @TotalRecords,
+        CAST(COUNT(*) * 100.0 / @TotalRecords AS DECIMAL(5,2)),
+        'Currency should be appropriate for the country',
+        STRING_AGG(CAST(survey_id AS VARCHAR(20)), ', ') WITHIN GROUP (ORDER BY survey_id),
+        GETDATE(),
+        CASE WHEN COUNT(*) = 0 THEN 'PASS' ELSE 'WARNING' END
+    FROM compensation_survey
+    WHERE (country_code = 'US' AND currency NOT IN ('USD'))
+       OR (country_code = 'GB' AND currency NOT IN ('GBP'))
+       OR (country_code = 'CA' AND currency NOT IN ('CAD', 'USD'))
+       OR (country_code IN ('DE', 'FR', 'IT', 'ES', 'NL') AND currency NOT IN ('EUR'));
+    
+    -- Rule CROSS-002: Industry-Salary Consistency
+    WITH IndustrySalaryOutliers AS (
+        SELECT 
+            cs.survey_id,
+            cs.industry,
+            cs.base_salary,
+            AVG(cs2.base_salary) as industry_avg_salary
+        FROM compensation_survey cs
+        INNER JOIN compensation_survey cs2 ON cs.industry = cs2.industry 
+                                          AND cs2.base_salary IS NOT NULL
+        WHERE cs.base_salary IS NOT NULL 
+          AND cs.industry IS NOT NULL
+        GROUP BY cs.survey_id, cs.industry, cs.base_salary
+        HAVING cs.base_salary > 3 * AVG(cs2.base_salary) 
+            OR cs.base_salary < 0.3 * AVG(cs2.base_salary)
+    )
+    INSERT INTO #DQ_ValidationResults
+    SELECT 
+        @ExecutionId,
+        'CROSS-002',
+        'Industry Salary Consistency',
+        'Cross-Category',
+        'LOW',
+        COUNT(*),
+        @TotalRecords,
+        CAST(COUNT(*) * 100.0 / @TotalRecords AS DECIMAL(5,2)),
+        'Salaries should be reasonable for the industry',
+        STRING_AGG(CAST(survey_id AS VARCHAR(20)), ', ') WITHIN GROUP (ORDER BY survey_id),
+        GETDATE(),
+        CASE WHEN COUNT(*) = 0 THEN 'PASS' ELSE 'WARNING' END
+    FROM IndustrySalaryOutliers;
+
+-- ============================================================================
+-- SECTION 9: ERROR HANDLING AND LOGGING
+-- ============================================================================
+
+    -- Calculate summary statistics
+    SELECT @ErrorCount = COUNT(*) FROM #DQ_ValidationResults WHERE Severity = 'HIGH' AND Status = 'FAIL';
+    SELECT @WarningCount = COUNT(*) FROM #DQ_ValidationResults WHERE Severity IN ('MEDIUM', 'LOW') AND Status IN ('FAIL', 'WARNING');
+    
+    PRINT '============================================================================';
+    PRINT 'Data Quality Validation Completed Successfully';
+    PRINT 'Execution Time: ' + CAST(DATEDIFF(SECOND, @StartTime, GETDATE()) AS VARCHAR(10)) + ' seconds';
+    PRINT 'Critical Errors Found: ' + CAST(@ErrorCount AS VARCHAR(10));
+    PRINT 'Warnings Found: ' + CAST(@WarningCount AS VARCHAR(10));
+    PRINT '============================================================================';
+    
+    -- Commit transaction if no critical errors
+    IF @ErrorCount = 0
+    BEGIN
+        COMMIT TRANSACTION DQ_Validation;
+        PRINT 'Transaction committed successfully - No critical data quality issues found.';
+    END
+    ELSE
+    BEGIN
+        PRINT 'WARNING: Critical data quality issues detected. Review results before proceeding.';
+        COMMIT TRANSACTION DQ_Validation;  -- Still commit to preserve results
+    END
+
+END TRY
+BEGIN CATCH
+    -- Error handling
+    IF @@TRANCOUNT > 0
+        ROLLBACK TRANSACTION DQ_Validation;
+    
+    DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+    DECLARE @ErrorSeverity INT = ERROR_SEVERITY();
+    DECLARE @ErrorState INT = ERROR_STATE();
+    DECLARE @ErrorProcedure NVARCHAR(128) = ISNULL(ERROR_PROCEDURE(), 'DQ_Validation_Script');
+    
+    -- Log error
+    INSERT INTO #DQ_ErrorLog
+    VALUES (@ExecutionId, GETDATE(), @ErrorMessage, @ErrorSeverity, @ErrorState, @ErrorProcedure);
+    
+    PRINT 'ERROR: Data Quality Validation failed with error: ' + @ErrorMessage;
+    
+    -- Re-raise the error
+    RAISERROR(@ErrorMessage, @ErrorSeverity, @ErrorState);
+END CATCH;
+
+-- ============================================================================
+-- SECTION 10: SUMMARY REPORTING
+-- ============================================================================
+
+-- Display comprehensive results summary
+PRINT 'DATA QUALITY VALIDATION SUMMARY REPORT';
+PRINT '============================================================================';
+
+-- Overall summary by category
 SELECT 
-    @ExecutionStartTime,
-    CheckName,
-    CheckCategory,
+    Category,
+    COUNT(*) as Total_Rules,
+    SUM(CASE WHEN Status = 'PASS' THEN 1 ELSE 0 END) as Rules_Passed,
+    SUM(CASE WHEN Status IN ('FAIL', 'WARNING') THEN 1 ELSE 0 END) as Rules_Failed,
+    SUM(ViolationCount) as Total_Violations,
+    CAST(AVG(ViolationPercentage) AS DECIMAL(5,2)) as Avg_Violation_Percentage
+FROM #DQ_ValidationResults
+GROUP BY Category
+ORDER BY Total_Violations DESC;
+
+-- Detailed results by severity
+SELECT 
+    Severity,
+    COUNT(*) as Rule_Count,
+    SUM(ViolationCount) as Total_Violations,
+    CAST(AVG(ViolationPercentage) AS DECIMAL(5,2)) as Avg_Violation_Percentage
+FROM #DQ_ValidationResults
+GROUP BY Severity
+ORDER BY 
+    CASE Severity 
+        WHEN 'HIGH' THEN 1 
+        WHEN 'MEDIUM' THEN 2 
+        WHEN 'LOW' THEN 3 
+    END;
+
+-- Top 10 most critical issues
+SELECT TOP 10
+    RuleId,
+    RuleName,
+    Category,
+    Severity,
+    ViolationCount,
+    ViolationPercentage,
+    Status
+FROM #DQ_ValidationResults
+WHERE Status IN ('FAIL', 'WARNING')
+ORDER BY 
+    CASE Severity WHEN 'HIGH' THEN 1 WHEN 'MEDIUM' THEN 2 WHEN 'LOW' THEN 3 END,
+    ViolationPercentage DESC;
+
+-- Complete detailed results
+SELECT 
+    RuleId,
+    RuleName,
+    Category,
+    Severity,
+    ViolationCount,
+    TotalRecords,
+    ViolationPercentage,
+    Description,
     Status,
-    ErrorCount,
-    AffectedRecords,
-    ErrorMessage,
-    @ExecutionDuration
-FROM #DQResults;
-*/
+    CheckTimestamp
+FROM #DQ_ValidationResults
+ORDER BY 
+    CASE Severity WHEN 'HIGH' THEN 1 WHEN 'MEDIUM' THEN 2 WHEN 'LOW' THEN 3 END,
+    Category,
+    RuleId;
+
+-- Display any errors that occurred
+IF EXISTS (SELECT 1 FROM #DQ_ErrorLog)
+BEGIN
+    PRINT 'ERRORS ENCOUNTERED DURING VALIDATION:';
+    SELECT * FROM #DQ_ErrorLog ORDER BY ErrorTimestamp;
+END
 
 -- Clean up temporary tables
-DROP TABLE #DQResults;
-DROP TABLE #DQErrors;
+IF OBJECT_ID('tempdb..#DQ_ValidationResults') IS NOT NULL
+    DROP TABLE #DQ_ValidationResults;
+    
+IF OBJECT_ID('tempdb..#DQ_ErrorLog') IS NOT NULL
+    DROP TABLE #DQ_ErrorLog;
 
--- Reset settings
-SET ANSI_WARNINGS ON;
-SET NOCOUNT OFF;
-
-PRINT '';
-PRINT 'Data Quality Validation Script Completed Successfully.';
-PRINT 'Review the results above for any data quality issues that need attention.';
+PRINT 'Data Quality Validation Script Execution Completed.';
+PRINT '============================================================================';
 
 /*
-=============================================================================
-QUALITY CHECKS SUMMARY TABLE
-=============================================================================
+==============================================================================
+DATA QUALITY RULES SUMMARY TABLE
+==============================================================================
 
-| Check Name                          | Purpose                           | Status      |
-|-------------------------------------|-----------------------------------|-------------|
-| Date Format Validation              | Validate date field formats      | Optimized   |
-| Email Format Validation             | Validate email address patterns   | Optimized   |
-| Phone Number Format Validation      | Validate phone number formats     | Optimized   |
-| Numeric Range Validation            | Check numeric values within range | Optimized   |
-| Referential Integrity - Orders      | Check for orphaned order details  | Optimized   |
-| Referential Integrity - Products    | Check for orphaned product refs   | Optimized   |
-| Null Value Validation - Customers   | Check required customer fields    | Optimized   |
-| Null Value Validation - Products    | Check required product fields     | Optimized   |
-| Business Rule - Discount Validation | Validate discount business rules  | Optimized   |
-| Business Rule - Future Date Valid   | Check for future order dates      | Optimized   |
-| Duplicate Detection - Customers     | Identify duplicate customers      | Optimized   |
-| Duplicate Detection - Products      | Identify duplicate products       | Optimized   |
-| Data Consistency - Order Totals     | Validate calculated totals        | New         |
+| Rule ID   | Rule Name                          | Category          | Purpose                                    | Status      |
+|-----------|------------------------------------|--------------------|--------------------------------------------|--------------|
+| GEO-001   | Country Code ISO Validation        | Geographic Data    | Validate ISO 3166-1 country codes        | Optimized   |
+| GEO-002   | Country Name Consistency           | Geographic Data    | Ensure consistent country naming          | Optimized   |
+| GEO-003   | Region Country Consistency         | Geographic Data    | Validate region-country relationships     | Optimized   |
+| GEO-004   | City Data Quality                  | Geographic Data    | Check city name format and completeness   | Optimized   |
+| IND-001   | Industry Code Validation           | Industry Data      | Validate NAICS/SIC industry codes        | Optimized   |
+| IND-002   | Industry Hierarchy Consistency     | Industry Data      | Check industry-subindustry relationships  | Optimized   |
+| IND-003   | Sector Classification Validation   | Industry Data      | Validate sector classifications           | Optimized   |
+| ORG-001   | Company ID Uniqueness              | Organization Data  | Ensure unique company identifiers         | Optimized   |
+| ORG-002   | Company Size Validation            | Organization Data  | Validate company size categories          | Optimized   |
+| ORG-003   | Employee Count Range Validation    | Organization Data  | Check employee count reasonableness       | Optimized   |
+| JOB-001   | Job Title Completeness and Format  | Job Data          | Validate job title presence and format    | Optimized   |
+| JOB-002   | Job Level Consistency              | Job Data          | Check job level and experience alignment  | Optimized   |
+| JOB-003   | Experience Range Validation        | Job Data          | Validate years of experience ranges       | Optimized   |
+| COMP-001  | Base Salary Range and Currency     | Compensation Data  | Validate salary ranges and currency codes | Optimized   |
+| COMP-002  | Salary Outlier Detection           | Compensation Data  | Identify statistical salary outliers      | New/Enhanced|
+| COMP-003  | Variable Pay Ratio Validation      | Compensation Data  | Check variable pay reasonableness         | Optimized   |
+| COMP-004  | Benefits Value Validation          | Compensation Data  | Validate benefits value ranges            | Optimized   |
+| COMP-005  | Total Compensation Consistency     | Compensation Data  | Verify total compensation calculations    | Optimized   |
+| META-001  | Survey Date Validation             | Survey Metadata    | Validate survey date ranges               | Optimized   |
+| META-002  | Response Completeness Assessment   | Survey Metadata    | Check response completeness levels        | Optimized   |
+| META-003  | Survey ID Uniqueness               | Survey Metadata    | Ensure unique survey identifiers          | Optimized   |
+| CROSS-001 | Geographic Currency Consistency    | Cross-Category     | Check country-currency alignment          | New         |
+| CROSS-002 | Industry Salary Consistency        | Cross-Category     | Validate industry-salary relationships    | New         |
 
-=============================================================================
+==============================================================================
 OPTIMIZATION FEATURES IMPLEMENTED:
-=============================================================================
+==============================================================================
 
-1. SET-BASED OPERATIONS: All checks use efficient set-based queries instead of cursors
-2. COMPREHENSIVE ERROR HANDLING: TRY-CATCH blocks for each check with detailed logging
-3. TRANSACTION SAFETY: XACT_ABORT ON for transaction consistency
-4. PERFORMANCE OPTIMIZATION: Efficient JOIN operations and minimal table scans
-5. IDEMPOTENT DESIGN: Script can be safely re-run multiple times
-6. STANDARDIZED LOGGING: Consistent error capture and reporting mechanism
-7. PARAMETERIZATION: Easy to modify for different tables and business rules
-8. PRODUCTION READY: Includes timing, status reporting, and cleanup procedures
-9. MAINTAINABLE CODE: Clear documentation and modular structure
-10. EXTENSIBLE DESIGN: Easy to add new checks following the established pattern
+1. **Set-Based Operations**: All checks use set-based queries instead of cursors
+2. **Consolidated Execution**: Single script handles all validation rules
+3. **Parameterized Configuration**: Configurable thresholds and limits
+4. **Comprehensive Error Handling**: Full transaction management and error logging
+5. **Performance Optimization**: Efficient CTEs and window functions
+6. **Idempotent Execution**: Safe to re-run multiple times
+7. **Centralized Logging**: Unified results and error tracking
+8. **Statistical Analysis**: Advanced outlier detection using percentiles
+9. **Cross-Category Validation**: Relationships between data categories
+10. **Production-Ready**: Comprehensive documentation and maintainability
 
-=============================================================================
+==============================================================================
 */
