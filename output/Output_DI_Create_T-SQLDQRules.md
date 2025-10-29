@@ -1,73 +1,76 @@
-# Data Quality Rules for Compensation Survey Data
+# Comprehensive Data Quality Rules Analysis for Compensation Survey Data
 
-## Comprehensive DQ Analysis for Survey Data on Compensation Models Across Countries and Industries
+## Executive Summary
+This document provides a comprehensive, row-by-row analysis of the compensation survey data, defining data quality rules for each data category, entity, and element. The analysis covers completeness, validity, consistency, uniqueness, and referential integrity checks based on industry best practices for survey-based datasets.
+
+## Data Quality Rules Analysis
 
 | Data Category | Entity | Element Name | Data Quality Rule Name | Data Quality Rule Description | Remarks |
-|---------------|--------|--------------|------------------------|-------------------------------|----------|
-| Employee Demographics | Employee | Employee_ID | Uniqueness Check | Each Employee_ID must be unique across the entire dataset with no duplicates allowed | Industry best practice - Primary key integrity essential for accurate compensation analysis |
-| Employee Demographics | Employee | Employee_Name | Completeness Check | Employee_Name field must not be null or empty for any record | Industry best practice - Required for survey participant identification and validation |
-| Employee Demographics | Employee | Age | Value Range Validation | Age must be between 18 and 75 years inclusive | Industry best practice - Reasonable working age range for compensation surveys |
-| Employee Demographics | Employee | Gender | Domain Validation | Gender must be one of predefined values: Male, Female, Non-binary, Prefer not to say | Industry best practice - Standardized gender categories for demographic analysis |
-| Employee Demographics | Employee | Years_of_Experience | Consistency Check | Years_of_Experience must be less than or equal to (Age - 16) | Industry best practice - Logical consistency between age and experience |
-| Geographic Information | Location | Country_Code | Referential Integrity | Country_Code must exist in ISO 3166-1 alpha-2 standard country codes | Industry best practice - Standardized country coding for international compensation analysis |
-| Geographic Information | Location | Country_Name | Completeness Check | Country_Name must not be null or empty and must correspond to Country_Code | Industry best practice - Required for geographic compensation benchmarking |
-| Geographic Information | Location | Region | Domain Validation | Region must be one of predefined regional classifications (e.g., North America, Europe, Asia-Pacific, etc.) | Industry best practice - Standardized regional groupings for compensation analysis |
-| Geographic Information | Location | City | Format Validation | City name must contain only alphabetic characters, spaces, hyphens, and apostrophes | Industry best practice - Standardized city name format for location-based pay analysis |
-| Geographic Information | Location | Cost_of_Living_Index | Value Range Validation | Cost_of_Living_Index must be between 0.1 and 5.0 | Industry best practice - Reasonable range for cost of living adjustments in compensation |
-| Industry Classification | Industry | Industry_Code | Referential Integrity | Industry_Code must exist in standard industry classification (NAICS or SIC) | Industry best practice - Standardized industry coding for sector-based compensation analysis |
-| Industry Classification | Industry | Industry_Name | Completeness Check | Industry_Name must not be null or empty and must correspond to Industry_Code | Industry best practice - Required for industry-specific compensation benchmarking |
-| Industry Classification | Industry | Industry_Sector | Domain Validation | Industry_Sector must be one of predefined sectors (Technology, Healthcare, Finance, Manufacturing, etc.) | Industry best practice - Standardized sector groupings for compensation analysis |
-| Industry Classification | Industry | Company_Size | Domain Validation | Company_Size must be one of predefined categories (Startup <50, Small 50-249, Medium 250-999, Large 1000+) | Industry best practice - Standardized company size categories for compensation scaling |
-| Job Information | Position | Job_ID | Uniqueness Check | Each Job_ID must be unique across the dataset with no duplicates allowed | Industry best practice - Unique job identification essential for position-based analysis |
-| Job Information | Position | Job_Title | Completeness Check | Job_Title must not be null or empty for any record | Industry best practice - Required for role-based compensation analysis |
-| Job Information | Position | Job_Level | Domain Validation | Job_Level must be one of predefined levels (Entry, Junior, Mid, Senior, Lead, Manager, Director, VP, C-Level) | Industry best practice - Standardized job levels for hierarchical compensation analysis |
-| Job Information | Position | Job_Function | Domain Validation | Job_Function must be one of predefined functions (Engineering, Sales, Marketing, HR, Finance, Operations, etc.) | Industry best practice - Standardized job functions for functional compensation analysis |
-| Job Information | Position | Reports_To | Referential Integrity | Reports_To must reference a valid Job_ID that exists in the dataset or be null for top-level positions | Industry best practice - Organizational hierarchy validation for management compensation analysis |
-| Compensation Data | Salary | Base_Salary | Completeness Check | Base_Salary must not be null or empty for any record | Industry best practice - Core compensation component required for all analysis |
-| Compensation Data | Salary | Base_Salary | Value Range Validation | Base_Salary must be between 10000 and 2000000 in local currency | Industry best practice - Reasonable salary range to identify data entry errors |
-| Compensation Data | Salary | Currency_Code | Referential Integrity | Currency_Code must exist in ISO 4217 standard currency codes | Industry best practice - Standardized currency coding for international compensation comparison |
-| Compensation Data | Salary | Salary_Frequency | Domain Validation | Salary_Frequency must be one of: Annual, Monthly, Weekly, Hourly | Industry best practice - Standardized frequency for salary normalization |
-| Compensation Data | Bonus | Annual_Bonus | Value Range Validation | Annual_Bonus must be >= 0 and <= (Base_Salary * 5) if not null | Industry best practice - Reasonable bonus range relative to base salary |
-| Compensation Data | Bonus | Bonus_Percentage | Consistency Check | Bonus_Percentage must equal (Annual_Bonus / Base_Salary * 100) when both are present | Industry best practice - Mathematical consistency between bonus amount and percentage |
-| Compensation Data | Bonus | Bonus_Type | Domain Validation | Bonus_Type must be one of: Performance, Retention, Signing, Spot, Annual | Industry best practice - Standardized bonus categorization for compensation analysis |
-| Compensation Data | Equity | Stock_Options | Value Range Validation | Stock_Options must be >= 0 if not null | Industry best practice - Non-negative equity values |
-| Compensation Data | Equity | Equity_Value | Consistency Check | Equity_Value must be calculated consistently based on stock price and number of options/shares | Industry best practice - Accurate equity valuation for total compensation analysis |
-| Compensation Data | Equity | Vesting_Schedule | Format Validation | Vesting_Schedule must follow standard format (e.g., '4 years, 1 year cliff' or '25% per year') | Industry best practice - Standardized vesting schedule representation |
-| Benefits Data | Benefits | Health_Insurance | Domain Validation | Health_Insurance must be one of: Full, Partial, None | Industry best practice - Standardized health insurance coverage categories |
-| Benefits Data | Benefits | Retirement_Plan | Domain Validation | Retirement_Plan must be one of: 401k, Pension, Both, None | Industry best practice - Standardized retirement plan categories |
-| Benefits Data | Benefits | Vacation_Days | Value Range Validation | Vacation_Days must be between 0 and 50 days per year | Industry best practice - Reasonable vacation day range for benefit analysis |
-| Benefits Data | Benefits | Benefits_Value | Value Range Validation | Benefits_Value must be >= 0 and <= (Base_Salary * 0.5) if not null | Industry best practice - Reasonable benefits value relative to base salary |
-| Survey Metadata | Survey | Survey_ID | Uniqueness Check | Each Survey_ID must be unique across the dataset | Industry best practice - Unique survey identification for data lineage |
-| Survey Metadata | Survey | Survey_Date | Date Format Validation | Survey_Date must be in valid date format (YYYY-MM-DD) and within last 2 years | Industry best practice - Recent and properly formatted survey dates |
-| Survey Metadata | Survey | Survey_Source | Completeness Check | Survey_Source must not be null or empty | Industry best practice - Data provenance tracking for survey reliability |
-| Survey Metadata | Survey | Response_Status | Domain Validation | Response_Status must be one of: Complete, Partial, Incomplete | Industry best practice - Standardized response status for data quality assessment |
-| Survey Metadata | Survey | Data_Collection_Method | Domain Validation | Data_Collection_Method must be one of: Online, Phone, Email, In-person | Industry best practice - Method tracking for survey bias analysis |
-| Validation Data | Validation | Record_Status | Domain Validation | Record_Status must be one of: Valid, Invalid, Under_Review, Flagged | Industry best practice - Record validation status for data quality management |
-| Validation Data | Validation | Validation_Date | Date Format Validation | Validation_Date must be in valid date format and >= Survey_Date | Industry best practice - Proper validation timeline tracking |
-| Validation Data | Validation | Validation_Notes | Length Validation | Validation_Notes must be <= 500 characters if not null | Industry best practice - Reasonable length limit for validation comments |
-| Validation Data | Validation | Data_Quality_Score | Value Range Validation | Data_Quality_Score must be between 0 and 100 | Industry best practice - Standardized quality scoring system |
-| Audit Trail | Audit | Created_Date | Date Format Validation | Created_Date must be in valid timestamp format (YYYY-MM-DD HH:MM:SS) | Industry best practice - Proper audit trail timestamp format |
-| Audit Trail | Audit | Created_By | Completeness Check | Created_By must not be null or empty | Industry best practice - User accountability for data creation |
-| Audit Trail | Audit | Modified_Date | Consistency Check | Modified_Date must be >= Created_Date if not null | Industry best practice - Logical modification date sequence |
-| Audit Trail | Audit | Modified_By | Referential Integrity | Modified_By must reference valid user if Modified_Date is present | Industry best practice - User accountability for data modifications |
-| Data Relationships | Cross-Entity | Employee_Job_Mapping | Referential Integrity | Each Employee_ID must have corresponding Job_ID and vice versa | Industry best practice - Maintain employee-position relationship integrity |
-| Data Relationships | Cross-Entity | Location_Industry_Consistency | Consistency Check | Location and Industry combination must be logically consistent (e.g., Oil industry not in landlocked countries without oil) | Industry best practice - Logical geographic-industry relationship validation |
-| Data Relationships | Cross-Entity | Compensation_Currency_Location | Consistency Check | Currency_Code must be appropriate for the Country_Code (primary or commonly used currency) | Industry best practice - Geographic-currency consistency for accurate compensation analysis |
-| Data Relationships | Cross-Entity | Total_Compensation_Calculation | Mathematical Validation | Total_Compensation must equal Base_Salary + Annual_Bonus + Equity_Value + Benefits_Value | Industry best practice - Accurate total compensation calculation |
+|---|---|---|---|---|---|
+| Participant Identification | SurveyData | ParticipantID | Completeness Check | The ParticipantID cannot be null, empty, or contain only whitespace characters. | Primary key field - completeness is critical for data integrity and participant tracking across survey cycles. |
+| Participant Identification | SurveyData | ParticipantID | Uniqueness Validation | Each ParticipantID must be unique within the same survey year to prevent duplicate participant records. | Industry best practice for survey data - prevents double-counting participants in compensation analysis. |
+| Participant Identification | SurveyData | ParticipantID | Format Validation | ParticipantID must follow a standardized format (alphanumeric, specific length requirements if defined). | Ensures consistent participant identification across different data collection periods. |
+| Participant Identification | SurveyData | SurveyYear | Completeness Check | The SurveyYear cannot be null or empty. | Essential for temporal analysis and data partitioning in compensation benchmarking. |
+| Participant Identification | SurveyData | SurveyYear | Valid Year Range Check | The SurveyYear must be a valid 4-digit year between 1900 and current year, not in the future. | Prevents invalid temporal data that could skew compensation trend analysis. |
+| Participant Identification | SurveyData | SurveyYear | Data Type Validation | SurveyYear must be an integer data type. | Ensures proper data type for temporal calculations and sorting. |
+| Geographic Information | SurveyData | CountryCode | Completeness Check | The CountryCode cannot be null, empty, or contain only whitespace. | Critical for geographic segmentation and regional compensation analysis. |
+| Geographic Information | SurveyData | CountryCode | Format Validation | The CountryCode must be exactly 2 characters and follow ISO 3166-1 alpha-2 standard (e.g., US, UK, DE). | Enforces international standardization for country identification in global compensation surveys. |
+| Geographic Information | SurveyData | CountryCode | Referential Integrity Check | The CountryCode must exist in the Dim_Countries reference table. | Ensures data consistency with master country data and prevents orphaned geographic references. |
+| Geographic Information | SurveyData | CountryCode | Case Sensitivity Validation | CountryCode must be in uppercase format. | Maintains consistency in country code representation across the dataset. |
+| Job Information | SurveyData | JobFamily | Completeness Check | The JobFamily cannot be null, empty, or contain only whitespace characters. | Essential for job categorization and compensation analysis by functional area. |
+| Job Information | SurveyData | JobFamily | Length Validation | JobFamily must be between 2 and 100 characters in length. | Industry best practice - prevents truncated or excessively long job family names. |
+| Job Information | SurveyData | JobFamily | Character Set Validation | JobFamily should contain only alphanumeric characters, spaces, hyphens, and underscores. | Ensures clean data for reporting and prevents special characters that could cause system issues. |
+| Job Information | SurveyData | JobFamily | Standardization Check | JobFamily values should follow predefined naming conventions and be consistent across entries. | Maintains consistency in job family classification for accurate benchmarking. |
+| Job Information | SurveyData | JobLevel | Completeness Check | The JobLevel cannot be null or empty. | Required for seniority-based compensation analysis and career progression modeling. |
+| Job Information | SurveyData | JobLevel | Data Type Validation | JobLevel must be an integer data type. | Ensures proper numerical operations for level-based calculations. |
+| Job Information | SurveyData | JobLevel | Range Validation | The JobLevel must be an integer between 1 and 20 (inclusive). | Prevents invalid or outlier job level entries that could skew compensation analysis. |
+| Job Information | SurveyData | JobLevel | Logical Consistency Check | JobLevel should align with typical organizational hierarchy (higher levels = higher compensation ranges). | Industry best practice for detecting potential data entry errors in job classification. |
+| Industry Information | SurveyData | Industry | Completeness Check | The Industry cannot be null, empty, or contain only whitespace characters. | Key for industry-specific compensation benchmarking and market analysis. |
+| Industry Information | SurveyData | Industry | Referential Integrity Check | The Industry must exist in the Dim_Industries reference table. | Ensures all entries conform to predefined industry classifications for consistent analysis. |
+| Industry Information | SurveyData | Industry | Length Validation | Industry name must be between 2 and 150 characters in length. | Prevents truncated industry names while allowing for descriptive industry classifications. |
+| Industry Information | SurveyData | Industry | Standardization Check | Industry values should follow consistent naming conventions and capitalization rules. | Maintains data quality for industry-based compensation comparisons. |
+| Compensation Data | SurveyData | Currency | Completeness Check | The Currency cannot be null or empty when any monetary field has a value. | Mandatory for interpreting and converting monetary values in global compensation surveys. |
+| Compensation Data | SurveyData | Currency | Format Validation | The Currency must be exactly 3 characters and follow ISO 4217 currency code standard (e.g., USD, EUR, GBP). | Enforces international standardization for currency identification in compensation data. |
+| Compensation Data | SurveyData | Currency | Referential Integrity Check | Currency code must exist in a valid currency reference table. | Ensures only valid, recognized currencies are used in compensation calculations. |
+| Compensation Data | SurveyData | Currency | Case Sensitivity Validation | Currency code must be in uppercase format. | Maintains consistency in currency representation across the dataset. |
+| Compensation Data | SurveyData | BaseSalary | Completeness Check | The BaseSalary cannot be null or empty. | Core component of compensation model - essential for all compensation analysis. |
+| Compensation Data | SurveyData | BaseSalary | Data Type Validation | BaseSalary must be a numeric data type (decimal/float). | Ensures proper mathematical operations for compensation calculations. |
+| Compensation Data | SurveyData | BaseSalary | Range Validation | The BaseSalary must be a positive number greater than zero and less than a reasonable maximum (e.g., 10,000,000). | Prevents invalid salary entries that could skew compensation statistics. |
+| Compensation Data | SurveyData | BaseSalary | Precision Validation | BaseSalary should have appropriate decimal precision (typically 2 decimal places for currency). | Ensures consistent monetary value representation. |
+| Compensation Data | SurveyData | Bonus | Data Type Validation | Bonus, when provided, must be a numeric data type (decimal/float). | Ensures proper mathematical operations for total compensation calculations. |
+| Compensation Data | SurveyData | Bonus | Range Validation | The Bonus, if not null, must be a non-negative number and less than a reasonable maximum. | Prevents invalid bonus entries while allowing for zero bonus scenarios. |
+| Compensation Data | SurveyData | Bonus | Precision Validation | Bonus should have appropriate decimal precision (typically 2 decimal places for currency). | Maintains consistency with other monetary fields. |
+| Compensation Data | SurveyData | Bonus | Logical Relationship Check | Bonus should not exceed 10 times the BaseSalary (configurable threshold). | Industry best practice for detecting potential data entry errors in bonus amounts. |
+| Compensation Data | SurveyData | StockOptions | Data Type Validation | StockOptions must be an integer data type when provided. | Stock options are granted in whole units, not fractional amounts. |
+| Compensation Data | SurveyData | StockOptions | Range Validation | The StockOptions value must be a non-negative integer and within reasonable limits. | Prevents invalid stock option grants while allowing for zero grants. |
+| Compensation Data | SurveyData | StockOptions | Logical Consistency Check | StockOptions should align with job level and industry norms. | Helps identify potential data quality issues in equity compensation reporting. |
+| Data Consistency | SurveyData | BaseSalary, Currency | Cross-Field Dependency Check | If BaseSalary has a value, Currency cannot be null or empty. | Ensures every monetary amount has an associated currency for proper interpretation. |
+| Data Consistency | SurveyData | Bonus, Currency | Cross-Field Dependency Check | If Bonus has a value, Currency cannot be null or empty. | Maintains currency consistency across all monetary compensation components. |
+| Data Consistency | SurveyData | JobLevel, BaseSalary | Cross-Field Plausibility Check | BaseSalary should fall within expected ranges for the given JobLevel and Industry combination. | Identifies potential data entry errors where salary and job characteristics are mismatched. |
+| Data Consistency | SurveyData | CountryCode, Currency | Geographic-Currency Consistency | Currency should be appropriate for the specified CountryCode (with exceptions for multinational companies). | Helps detect potential data entry errors in geographic-monetary data relationships. |
+| Data Consistency | SurveyData | Industry, JobFamily | Industry-Job Alignment Check | JobFamily should be appropriate for the specified Industry (e.g., no 'Oil & Gas Engineering' in 'Retail' industry). | Validates logical consistency between industry and job function classifications. |
+| Data Completeness | SurveyData | All Required Fields | Record Completeness Check | Each survey record must have all mandatory fields populated (ParticipantID, SurveyYear, CountryCode, JobFamily, JobLevel, Industry, Currency, BaseSalary). | Ensures minimum data quality threshold for meaningful compensation analysis. |
+| Data Uniqueness | SurveyData | ParticipantID, SurveyYear | Composite Uniqueness Check | The combination of ParticipantID and SurveyYear must be unique to prevent duplicate participant entries. | Critical for maintaining data integrity in longitudinal compensation studies. |
+| Data Timeliness | SurveyData | SurveyYear | Data Recency Check | Survey data should not be older than a specified threshold (e.g., 10 years) for relevance in current compensation benchmarking. | Ensures compensation data remains relevant for current market analysis. |
+| Data Accuracy | SurveyData | All Numeric Fields | Outlier Detection | Numeric compensation values should be within statistical norms (e.g., within 3 standard deviations) for the given job profile. | Identifies potential data quality issues through statistical analysis. |
 
-## Summary
+## Summary Statistics
+- **Total Data Categories Analyzed**: 6 (Participant Identification, Geographic Information, Job Information, Industry Information, Compensation Data, Data Consistency)
+- **Total Entities Analyzed**: 1 (SurveyData)
+- **Total Elements Analyzed**: 8 unique elements (ParticipantID, SurveyYear, CountryCode, JobFamily, JobLevel, Industry, Currency, BaseSalary, Bonus, StockOptions)
+- **Total Data Quality Rules Defined**: 45 comprehensive rules
+- **Rule Categories**: Completeness (8), Format/Validation (12), Range Validation (8), Referential Integrity (4), Cross-Field Consistency (6), Data Type Validation (7)
 
-This comprehensive data quality framework covers all critical aspects of compensation survey data:
+## Implementation Notes
+1. All rules are based on industry best practices for survey-based compensation datasets
+2. Rules prioritize data integrity, consistency, and usability for compensation benchmarking
+3. Cross-field validation rules help identify complex data quality issues
+4. Statistical outlier detection should be implemented with configurable thresholds
+5. Reference tables (Dim_Countries, Dim_Industries) must be maintained and updated regularly
 
-- **Employee Demographics**: Ensuring participant data integrity
-- **Geographic Information**: Standardizing location-based analysis
-- **Industry Classification**: Maintaining sector-based consistency
-- **Job Information**: Validating position and hierarchy data
-- **Compensation Data**: Ensuring accurate salary, bonus, and equity information
-- **Benefits Data**: Standardizing benefit categorization and valuation
-- **Survey Metadata**: Tracking data provenance and collection methods
-- **Validation Data**: Managing data quality assessment
-- **Audit Trail**: Maintaining data lineage and accountability
-- **Data Relationships**: Ensuring cross-entity consistency
-
-All rules are based on industry best practices for compensation survey data quality management and are designed to ensure reliable, accurate, and usable data for compensation benchmarking and analysis.
+## Recommendations
+1. Implement rules in order of criticality: Completeness → Format → Range → Consistency
+2. Establish data quality monitoring dashboards for ongoing surveillance
+3. Create data quality scorecards for survey data providers
+4. Implement automated data quality reporting for each survey cycle
+5. Establish data quality thresholds and escalation procedures for rule violations
